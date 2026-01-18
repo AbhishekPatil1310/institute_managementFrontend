@@ -1,0 +1,15 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap");
+
+/* Replace the three @tailwind directives with this: */
+@import "tailwindcss";
+
+/* If you still have a tailwind.config.js you want to use, import it like this: */
+@config "../tailwind.config.js";
+body {
+  font-family: "Inter", sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-color: theme('colors.neutral');
+  color: theme('colors.text-primary');
+}
+
