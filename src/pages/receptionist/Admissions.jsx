@@ -52,7 +52,7 @@ const Admissions = () => {
 
       {error && <p className="text-red-600 mb-3">{error}</p>}
 
-      <div className="bg-white p-4 rounded shadow max-w-md space-y-3">
+      <div className="bg-white p-4 rounded shadow w-full space-y-3">
         <select
           value={batchId}
           onChange={(e) => setBatchId(e.target.value)}
@@ -79,15 +79,6 @@ const Admissions = () => {
           ))}
         </select>
 
-        <select
-          value={paymentSource}
-          onChange={(e) => setPaymentSource(e.target.value)}
-          className="border px-3 py-2 rounded w-full"
-        >
-          <option value="CASH">Cash</option>
-          <option value="QR1">QR 1</option>
-          <option value="QR2">QR 2</option>
-        </select>
 
         <button
           onClick={submit}

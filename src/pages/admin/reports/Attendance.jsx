@@ -55,7 +55,7 @@ const AttendanceReports = () => {
       />
 
       {/* Overall */}
-      <div className="bg-white p-4 rounded shadow mb-6 max-w-sm">
+      <div className="bg-white p-4 rounded shadow mb-6 w-full">
         <p className="text-sm text-gray-500">Overall Attendance</p>
         <p className="text-xl font-semibold">
           {overall?.attendance_percentage
@@ -65,7 +65,7 @@ const AttendanceReports = () => {
       </div>
 
       {/* Batch-wise */}
-      <div className="max-w-md">
+      <div className="w-full">
         <select
           value={batchId}
           onChange={(e) => setBatchId(e.target.value)}
@@ -79,8 +79,9 @@ const AttendanceReports = () => {
           ))}
         </select>
 
+        {/* Table on medium and larger screens */}
         {batchData.length > 0 && (
-          <div className="bg-white rounded shadow overflow-x-auto">
+          <div className="hidden md:block bg-white rounded shadow overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
                 <tr className="bg-gray-100">
@@ -90,17 +91,37 @@ const AttendanceReports = () => {
                 </tr>
               </thead>
               <tbody>
-                {batchData.map(d => (
+                {batchData.map((d) => (
                   <tr key={d.attendance_date}>
-                    <td className="p-2 border">
-                      {d.attendance_date}
-                    </td>
+                    <td className="p-2 border">{d.attendance_date}</td>
                     <td className="p-2 border">{d.present}</td>
                     <td className="p-2 border">{d.absent}</td>
                   </tr>
                 ))}
               </tbody>
             </table>
+          </div>
+        )}
+
+        {/* Cards on small screens */}
+        {batchData.length > 0 && (
+          <div className="md:hidden grid grid-cols-1 gap-4">
+            {batchData.map((d) => (
+              <div
+                key={d.attendance_date}
+                className="bg-white p-4 rounded-lg shadow"
+              >
+                <h3 className="text-lg font-semibold">{d.attendance_date}</h3>
+                <div className="mt-2 text-sm text-gray-600">
+                  <p>
+                    <strong>Present:</strong> {d.present}
+                  </p>
+                  <p>
+                    <strong>Absent:</strong> {d.absent}
+                  </p>
+                </div>
+              </div>
+            ))}
           </div>
         )}
 

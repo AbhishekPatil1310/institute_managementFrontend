@@ -105,7 +105,7 @@ const References = () => {
       {/* Form */}
       <form
         onSubmit={handleSubmit}
-        className="bg-white p-4 rounded shadow mb-6 grid grid-cols-2 gap-4 max-w-xl"
+        className="bg-white p-4 rounded shadow mb-6 grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-xl"
       >
         <input
           name="name"
@@ -147,8 +147,8 @@ const References = () => {
         </div>
       </form>
 
-      {/* Table */}
-      <div className="bg-white rounded shadow overflow-x-auto max-w-xl">
+      {/* Table on medium and larger screens */}
+      <div className="hidden md:block bg-white rounded shadow overflow-x-auto max-w-xl">
         <table className="w-full border-collapse">
           <thead>
             <tr className="bg-gray-100 text-left">
@@ -160,12 +160,8 @@ const References = () => {
           <tbody>
             {references.map((r) => (
               <tr key={r.id}>
-                <td className="p-2 border">
-                  {r.name}
-                </td>
-                <td className="p-2 border">
-                  ₹{r.concession}
-                </td>
+                <td className="p-2 border">{r.name}</td>
+                <td className="p-2 border">₹{r.concession}</td>
                 <td className="p-2 border space-x-2">
                   <button
                     onClick={() => handleEdit(r)}
@@ -185,16 +181,48 @@ const References = () => {
 
             {!references.length && (
               <tr>
-                <td
-                  colSpan="3"
-                  className="p-4 text-center text-gray-500"
-                >
+                <td colSpan="3" className="p-4 text-center text-gray-500">
                   No references found
                 </td>
               </tr>
             )}
           </tbody>
         </table>
+      </div>
+
+      {/* Cards on small screens */}
+      <div className="md:hidden grid grid-cols-1 gap-4 max-w-xl">
+        {references.map((r) => (
+          <div key={r.id} className="bg-white p-4 rounded-lg shadow">
+            <div className="flex justify-between items-start">
+              <h3 className="text-lg font-semibold">{r.name}</h3>
+              <div className="flex space-x-2">
+                <button
+                  onClick={() => handleEdit(r)}
+                  className="text-blue-600"
+                >
+                  Edit
+                </button>
+                <button
+                  onClick={() => handleDelete(r.id)}
+                  className="text-red-600"
+                >
+                  Delete
+                </button>
+              </div>
+            </div>
+            <div className="mt-2 text-sm text-gray-600">
+              <p>
+                <strong>Concession:</strong> ₹{r.concession}
+              </p>
+            </div>
+          </div>
+        ))}
+        {!references.length && (
+          <div className="bg-white p-4 rounded-lg shadow text-center text-gray-500">
+            No references found
+          </div>
+        )}
       </div>
     </div>
   );

@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import api from "../../services/api";
 
-const ROLES = ["RECEPTIONIST", "DIRECTOR", "STUDENT"];
+const ROLES = ["RECEPTIONIST", "DIRECTOR", "STUDENT","DTP Operator","Attendance Clerk"];
 
 const Users = () => {
   const [users, setUsers] = useState([]);
@@ -100,7 +100,7 @@ const Users = () => {
       {/* Create User */}
       <form
         onSubmit={handleCreate}
-        className="bg-white p-4 rounded shadow mb-6 grid grid-cols-2 gap-4 max-w-xl"
+        className="bg-white p-4 rounded shadow mb-6 grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-xl"
       >
         <input
           name="name"
@@ -154,8 +154,8 @@ const Users = () => {
         </div>
       </form>
 
-      {/* Users Table */}
-      <div className="bg-white rounded shadow overflow-x-auto">
+      {/* Users Table on medium and larger screens */}
+      <div className="hidden md:block bg-white rounded shadow overflow-x-auto">
         <table className="w-full border-collapse">
           <thead>
             <tr className="bg-gray-100 text-left">
@@ -169,33 +169,21 @@ const Users = () => {
           <tbody>
             {users.map((u) => (
               <tr key={u.id}>
-                <td className="p-2 border">
-                  {u.name}
-                </td>
-                <td className="p-2 border">
-                  {u.email}
-                </td>
-                <td className="p-2 border">
-                  {u.role}
-                </td>
+                <td className="p-2 border">{u.name}</td>
+                <td className="p-2 border">{u.email}</td>
+                <td className="p-2 border">{u.role}</td>
                 <td className="p-2 border">
                   {u.is_active ? (
-                    <span className="text-green-600">
-                      Active
-                    </span>
+                    <span className="text-green-600">Active</span>
                   ) : (
-                    <span className="text-gray-500">
-                      Disabled
-                    </span>
+                    <span className="text-gray-500">Disabled</span>
                   )}
                 </td>
                 <td className="p-2 border">
                   <button
                     onClick={() => toggleUser(u)}
                     className={`${
-                      u.is_active
-                        ? "text-red-600"
-                        : "text-green-600"
+                      u.is_active ? "text-red-600" : "text-green-600"
                     }`}
                   >
                     {u.is_active ? "Disable" : "Enable"}
@@ -203,19 +191,52 @@ const Users = () => {
                 </td>
               </tr>
             ))}
-
             {!users.length && (
               <tr>
-                <td
-                  colSpan="5"
-                  className="p-4 text-center text-gray-500"
-                >
+                <td colSpan="5" className="p-4 text-center text-gray-500">
                   No users found
                 </td>
               </tr>
             )}
           </tbody>
         </table>
+      </div>
+
+      {/* Cards on small screens */}
+      <div className="md:hidden grid grid-cols-1 gap-4">
+        {users.map((u) => (
+          <div key={u.id} className="bg-white p-4 rounded-lg shadow">
+            <div className="flex justify-between items-start">
+              <div>
+                <h3 className="text-lg font-semibold">{u.name}</h3>
+                <p className="text-sm text-gray-600">{u.email}</p>
+                <p className="text-sm text-gray-600">{u.role}</p>
+              </div>
+              <div className="text-right">
+                <p
+                  className={`text-sm font-semibold ${
+                    u.is_active ? "text-green-600" : "text-gray-500"
+                  }`}
+                >
+                  {u.is_active ? "Active" : "Disabled"}
+                </p>
+                <button
+                  onClick={() => toggleUser(u)}
+                  className={`mt-2 text-sm ${
+                    u.is_active ? "text-red-600" : "text-green-600"
+                  }`}
+                >
+                  {u.is_active ? "Disable" : "Enable"}
+                </button>
+              </div>
+            </div>
+          </div>
+        ))}
+        {!users.length && (
+          <div className="bg-white p-4 rounded-lg shadow text-center text-gray-500">
+            No users found
+          </div>
+        )}
       </div>
     </div>
   );
