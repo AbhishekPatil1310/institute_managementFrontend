@@ -92,6 +92,9 @@ const AttendanceReports = lazy(() =>
 
 const Subjects = lazy(() => import("../pages/admin/Subjects"));
 
+const ReportDownloader = lazy(() => import("../pages/admin/reports/ReportDownloader"));
+
+
 
 /*----------- Attendance Clerk------------*/
 
@@ -175,5 +178,9 @@ export const adminRoutes = {
       path: "reports/attendance",
       element: <AttendanceReports />,
     },
+    {
+      path: "reports/download",
+      element: <ReportDownloader />,
+    }
   ],
 };
