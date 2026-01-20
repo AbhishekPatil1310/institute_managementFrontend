@@ -34,10 +34,10 @@ const StudentRegister = () => {
   };
 
   return (
-    <div className="flex items-center justify-center">
+    <div className="min-h-screen flex items-center justify-center p-4 sm:p-8">
       <form
         onSubmit={submit}
-        className="bg-white p-8 rounded-xl shadow-lg w-full max-w-md"
+        className="bg-white p-6 sm:p-8 rounded-xl shadow-lg w-full max-w-md"
       >
         <h1 className="text-3xl font-bold mb-6 text-center text-text-primary">
           Register for Admission

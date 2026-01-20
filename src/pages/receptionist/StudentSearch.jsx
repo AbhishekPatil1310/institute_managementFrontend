@@ -26,16 +26,16 @@ const StudentSearch = () => {
         Student Search
       </h1>
 
-      <div className="flex gap-2 mb-4">
+      <div className="flex flex-col sm:flex-row gap-2 mb-4 max-w-md">
         <input
           placeholder="Enter mobile number"
           value={phone}
           onChange={(e) => setPhone(e.target.value)}
-          className="border px-3 py-2 rounded"
+          className="border px-3 py-2 rounded w-full"
         />
         <button
           onClick={search}
-          className="bg-blue-600 text-white px-4 py-2 rounded"
+          className="bg-blue-600 text-white px-4 py-2 rounded w-full sm:w-auto"
         >
           Search
         </button>

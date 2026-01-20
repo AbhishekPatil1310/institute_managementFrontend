@@ -13,14 +13,14 @@ const Unauthorized = lazy(() =>
 import StudentLayout from "../pages/student/StudentLayout";
 import ReceptionistLayout from "../pages/receptionist/ReceptionistLayout";
 import AdminLayout from "../pages/admin/AdminLayout";
+import DTPLayout from "../pages/dtp/DTPLayout";
+
 
 /* ---------- student ---------- */
 const StudentDashboard = lazy(() =>
   import("../pages/student/Dashboard")
 );
-const AttendanceScan = lazy(() =>
-  import("../pages/student/AttendanceScan")
-);
+
 const StudentExams = lazy(() =>
   import("../pages/student/Exams")
 );
@@ -47,6 +47,12 @@ const Payments = lazy(() =>
 const Dues = lazy(() =>
   import("../pages/receptionist/Dues")
 );
+
+
+/* ---------- dtp operator ---------- */
+const DTPDashboard = lazy(() => import("../pages/dtp/Dashboard")); // Optional: Simple dashboard
+const DTPMarksEntry = lazy(() => import("../pages/dtp/MarksEntry")); // The component we built
+
 
 /* ---------- admin ---------- */
 const AdminDashboard = lazy(() =>
@@ -77,6 +83,16 @@ const AttendanceReports = lazy(() =>
   import("../pages/admin/reports/Attendance")
 );
 
+const Subjects = lazy(() => import("../pages/admin/Subjects"));
+
+
+/*----------- Attendance Clerk------------*/
+
+const ClerkLayout = lazy(() => import("../pages/clerk/ClerkLayout"));
+const AttendanceScan = lazy(() => import("../pages/clerk/AttendanceScan"));
+const AttendanceStatus = lazy(() => import("../pages/clerk/AttendanceStatus"));
+
+
 /* ---------- route definitions ---------- */
 
 export const publicRoutes = [
@@ -90,7 +106,6 @@ export const studentRoutes = {
   layout: <StudentLayout />,
   children: [
     { path: "dashboard", element: <StudentDashboard /> },
-    { path: "attendance/scan", element: <AttendanceScan /> },
     { path: "exams", element: <StudentExams /> },
     { path: "profile", element: <StudentProfile /> },
     {
@@ -99,6 +114,25 @@ export const studentRoutes = {
     },
   ],
 };
+
+export const dtpRoutes = {
+  path: "/dtp",
+  layout: <DTPLayout />,
+  children: [
+    { path: "dashboard", element: <DTPDashboard /> },
+    { path: "marks-entry", element: <DTPMarksEntry /> },
+  ],
+};
+
+export const clerkRoutes = {
+  path: "/clerk",
+  layout: <ClerkLayout />,
+  children: [
+    { path: "attendance-scan", element: <AttendanceScan /> },
+    { path: "student-attendance", element: <AttendanceStatus /> },
+  ],
+};
+
 
 export const receptionistRoutes = {
   path: "/receptionist",
@@ -123,6 +157,7 @@ export const adminRoutes = {
     { path: "users", element: <Users /> },
     { path: "exams", element: <Exams /> },
     { path: "attendance-qr", element: <AttendanceQR /> },
+    { path: "subjects", element: <Subjects /> },
     {
       path: "reports/financial",
       element: <FinancialReports />,

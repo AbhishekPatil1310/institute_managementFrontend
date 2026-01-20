@@ -19,6 +19,10 @@ const Login = () => {
         navigate("/receptionist/dashboard", { replace: true });
       } else if (user?.role === "STUDENT") {
         navigate("/student/dashboard", { replace: true });
+      }else if (user?.role === "DTP Operator") {
+        navigate("/DTP/dashboard", { replace: true });
+      }else if (user?.role === "Attendance Clerk") {
+        navigate("/clerk/attendance-scan", { replace: true });
       }
     }
   }, [user, navigate, isAuthenticated]);
@@ -41,10 +45,10 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center">
+    <div className="min-h-screen flex items-center justify-center p-4 sm:p-8">
       <form
         onSubmit={handleSubmit}
-        className="bg-white p-8 rounded-xl shadow-lg w-full max-w-md"
+        className="bg-white p-6 sm:p-8 rounded-xl shadow-lg w-full max-w-md"
       >
         <h1 className="text-3xl font-bold mb-6 text-center text-text-primary">
           Welcome Back
