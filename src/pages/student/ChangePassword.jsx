@@ -1,77 +1,135 @@
 import { useState } from "react";
 import api from "../../services/api";
-import { useNavigate } from "react-router-dom";
 
 const ChangePassword = () => {
-  const [password, setPassword] = useState("");
-  const [confirm, setConfirm] = useState("");
-  const [error, setError] = useState(null);
-  const navigate = useNavigate();
+  const [formData, setFormData] = useState({
+    currentPassword: "",
+    newPassword: "",
+    confirmPassword: "",
+  });
 
-  const submit = async (e) => {
+  const [status, setStatus] = useState({ type: "", message: "" });
+  const [loading, setLoading] = useState(false);
+
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    setError(null);
+    setStatus({ type: "", message: "" });
 
-    if (password.length < 8) {
-      return setError("Password must be at least 8 characters");
+    // Client-side validation
+    if (formData.newPassword !== formData.confirmPassword) {
+      return setStatus({ type: "error", message: "New passwords do not match!" });
     }
 
-    if (password !== confirm) {
-      return setError("Passwords do not match");
+    if (formData.newPassword.length < 6) {
+      return setStatus({ type: "error", message: "Password must be at least 6 characters." });
     }
+
+    setLoading(true);
 
     try {
-      await api.post("/api/student/change-password", {
-        password,
+      const res = await api.post("/api/students/change-password", {
+        currentPassword: formData.currentPassword,
+        newPassword: formData.newPassword,
       });
-      navigate("/student/dashboard", { replace: true });
+
+      setStatus({ type: "success", message: res.data.message });
+      // Clear form on success
+      setFormData({ currentPassword: "", newPassword: "", confirmPassword: "" });
     } catch (err) {
-      setError(
-        err?.response?.data?.message ||
-          "Password change failed"
-      );
+      setStatus({
+        type: "error",
+        message: err.response?.data?.message || "Something went wrong",
+      });
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <div className="max-w-md">
-      <h1 className="text-xl font-semibold mb-4">
-        Change Password
-      </h1>
+    <div className="max-w-md mx-auto mt-10">
+      <div className="bg-white p-8 rounded-2xl shadow-sm border border-gray-100">
+        <h2 className="text-2xl font-bold text-gray-800 mb-2">Change Password</h2>
+        <p className="text-sm text-gray-500 mb-6">
+          Keep your account secure by updating your password regularly.
+        </p>
 
-      {error && (
-        <p className="text-red-600 mb-3">{error}</p>
-      )}
+        {status.message && (
+          <div
+            className={`p-4 rounded-lg mb-6 text-sm font-medium ${
+              status.type === "success"
+                ? "bg-green-50 text-green-700 border border-green-200"
+                : "bg-red-50 text-red-700 border border-red-200"
+            }`}
+          >
+            {status.message}
+          </div>
+        )}
 
-      <form
-        onSubmit={submit}
-        className="bg-white p-4 rounded shadow space-y-3"
-      >
-        <input
-          type="password"
-          placeholder="New password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          className="border px-3 py-2 rounded w-full"
-          required
-        />
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div>
+            <label className="block text-sm font-semibold text-gray-700 mb-1">
+              Current Password
+            </label>
+            <input
+              type="password"
+              name="currentPassword"
+              required
+              value={formData.currentPassword}
+              onChange={handleChange}
+              className="w-full p-3 border rounded-xl bg-gray-50 focus:ring-2 focus:ring-indigo-500 outline-none transition"
+              placeholder="••••••••"
+            />
+          </div>
 
-        <input
-          type="password"
-          placeholder="Confirm password"
-          value={confirm}
-          onChange={(e) => setConfirm(e.target.value)}
-          className="border px-3 py-2 rounded w-full"
-          required
-        />
+          <hr className="my-4 border-gray-100" />
 
-        <button
-          type="submit"
-          className="bg-blue-600 text-white px-4 py-2 rounded w-full"
-        >
-          Update Password
-        </button>
-      </form>
+          <div>
+            <label className="block text-sm font-semibold text-gray-700 mb-1">
+              New Password
+            </label>
+            <input
+              type="password"
+              name="newPassword"
+              required
+              value={formData.newPassword}
+              onChange={handleChange}
+              className="w-full p-3 border rounded-xl bg-gray-50 focus:ring-2 focus:ring-indigo-500 outline-none transition"
+              placeholder="••••••••"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-semibold text-gray-700 mb-1">
+              Confirm New Password
+            </label>
+            <input
+              type="password"
+              name="confirmPassword"
+              required
+              value={formData.confirmPassword}
+              onChange={handleChange}
+              className="w-full p-3 border rounded-xl bg-gray-50 focus:ring-2 focus:ring-indigo-500 outline-none transition"
+              placeholder="••••••••"
+            />
+          </div>
+
+          <button
+            type="submit"
+            disabled={loading}
+            className={`w-full py-3 rounded-xl font-bold text-white transition-all shadow-lg ${
+              loading
+                ? "bg-gray-400 cursor-not-allowed"
+                : "bg-indigo-600 hover:bg-indigo-700 active:scale-95"
+            }`}
+          >
+            {loading ? "Updating..." : "Update Password"}
+          </button>
+        </form>
+      </div>
     </div>
   );
 };
