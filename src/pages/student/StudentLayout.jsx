@@ -80,11 +80,14 @@ const StudentLayout = () => {
           <NavLink to="/student/dashboard" className={linkClass} end>
             Dashboard
           </NavLink>
-          <NavLink to="/student/attendance/scan" className={linkClass}>
-            Attendance
+          <NavLink to="/student/fees" className={linkClass}>
+            fee section
           </NavLink>
           <NavLink to="/student/exams" className={linkClass}>
             Exams
+          </NavLink>
+          <NavLink to="/student/results" className={linkClass}>
+            result
           </NavLink>
 
         </nav>

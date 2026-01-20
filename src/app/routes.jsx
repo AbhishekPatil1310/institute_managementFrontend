@@ -31,6 +31,13 @@ const ChangePassword = lazy(() =>
   import("../pages/student/ChangePassword")
 );
 
+const FeeStatus = lazy(() =>
+  import("../pages/student/FeeStatus")
+);
+
+const StudentMarks = lazy(() => import("../pages/student/Marks"));
+
+
 /* ---------- receptionist ---------- */
 const ReceptionistDashboard = lazy(() =>
   import("../pages/receptionist/Dashboard")
@@ -108,6 +115,8 @@ export const studentRoutes = {
     { path: "dashboard", element: <StudentDashboard /> },
     { path: "exams", element: <StudentExams /> },
     { path: "profile", element: <StudentProfile /> },
+    { path: "fees", element: <FeeStatus /> },
+    { path: "results", element: <StudentMarks /> },
     {
       path: "profile/change-password",
       element: <ChangePassword />,
