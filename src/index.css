@@ -13,3 +13,23 @@ body {
   color: theme('colors.text-primary');
 }
 
+<<<<<<< HEAD
+=======
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: theme('colors.neutral-dark');
+}
+
+::-webkit-scrollbar-thumb {
+  background: theme('colors.primary');
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: theme('colors.primary-dark');
+}
+>>>>>>> master
