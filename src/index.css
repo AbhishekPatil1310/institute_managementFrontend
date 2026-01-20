@@ -13,8 +13,6 @@ body {
   color: theme('colors.text-primary');
 }
 
-<<<<<<< HEAD
-=======
 /* Custom scrollbar */
 ::-webkit-scrollbar {
   width: 8px;
@@ -32,4 +30,3 @@ body {
 ::-webkit-scrollbar-thumb:hover {
   background: theme('colors.primary-dark');
 }
->>>>>>> master
