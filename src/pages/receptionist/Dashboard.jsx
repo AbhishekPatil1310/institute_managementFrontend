@@ -9,21 +9,31 @@ const ReceptionistDashboard = () => {
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // Search States
+  // Pagination & Search States
   const [searchPhone, setSearchPhone] = useState("");
   const [isSearching, setIsSearching] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const limit = 10; // Records per page
 
-  const fetchDashboardData = async () => {
+  const fetchDashboardData = async (page = 1) => {
     try {
       setLoading(true);
       setError(null);
+      
+      // Fetching summary and paginated list
       const [summaryRes, pendingRes] = await Promise.all([
         api.get("/api/reception/dashboard"),
-        api.get("/api/reception/students/pending-fees")
+        api.get(`/api/reception/students/pending-fees?page=${page}&limit=${limit}`)
       ]);
       
       setSummary(summaryRes.data);
-      setPendingStudents(Array.isArray(pendingRes.data) ? pendingRes.data : []);
+      
+      // Map to the new backend structure: { data: [...], pagination: {...} }
+      setPendingStudents(Array.isArray(pendingRes.data.data) ? pendingRes.data.data : []);
+      setTotalPages(pendingRes.data.pagination?.totalPages || 1);
+      setCurrentPage(pendingRes.data.pagination?.currentPage || 1);
+      
     } catch (err) {
       setError("Failed to load dashboard data");
       console.error("Dashboard Fetch Error:", err);
@@ -33,15 +43,14 @@ const ReceptionistDashboard = () => {
   };
 
   useEffect(() => {
-    fetchDashboardData();
+    fetchDashboardData(1);
   }, []);
 
-  // Manual Search Handler
   const handleSearch = async (e) => {
-    if (e) e.preventDefault(); // Prevents page reload
+    if (e) e.preventDefault();
 
     if (!searchPhone.trim()) {
-      return fetchDashboardData();
+      return fetchDashboardData(1);
     }
 
     try {
@@ -49,8 +58,9 @@ const ReceptionistDashboard = () => {
       setError(null);
       const response = await api.get(`/api/reception/students/pending-fees/search?phone=${searchPhone}`);
       
-      // Use the data returned from your getStudentByPendingByPhone query
+      // Search results usually bypass standard pagination in simple implementations
       setPendingStudents(Array.isArray(response.data) ? response.data : []);
+      setTotalPages(1); 
     } catch (err) {
       console.error("Search Error:", err);
       setError("Error searching for student.");
@@ -61,7 +71,13 @@ const ReceptionistDashboard = () => {
 
   const handleClearSearch = () => {
     setSearchPhone("");
-    fetchDashboardData();
+    fetchDashboardData(1);
+  };
+
+  const handlePageChange = (newPage) => {
+    if (newPage >= 1 && newPage <= totalPages) {
+      fetchDashboardData(newPage);
+    }
   };
 
   const handleCollectFee = (student) => {
@@ -99,18 +115,19 @@ const ReceptionistDashboard = () => {
             <p className="text-2xl font-bold text-gray-800">{summary.today_count || 0}</p>
           </div>
           <div className="bg-white p-6 rounded-xl shadow-sm border-l-4 border-red-500">
-            <p className="text-sm text-gray-500 font-medium uppercase tracking-wider">Students with Dues</p>
-            <p className="text-2xl font-bold text-gray-800">{pendingStudents.length}</p>
+            <p className="text-sm text-gray-500 font-medium uppercase tracking-wider">Total Records with Dues</p>
+            {/* Showing total count from pagination metadata if available */}
+            <p className="text-2xl font-bold text-gray-800">
+                {summary.pagination?.totalItems || pendingStudents.length}
+            </p>
           </div>
         </div>
       )}
 
-      {/* Fee Defaulters List Container */}
       <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
         <div className="p-4 border-b bg-gray-50 flex flex-col md:flex-row justify-between items-center gap-4">
           <h2 className="font-semibold text-gray-700">Fee Defaulters List</h2>
 
-          {/* Search Form */}
           <form onSubmit={handleSearch} className="flex items-center gap-2 w-full md:w-auto">
             <div className="relative flex-grow">
               <input
@@ -198,6 +215,31 @@ const ReceptionistDashboard = () => {
             </tbody>
           </table>
         </div>
+
+        {/* Pagination Footer */}
+        {!searchPhone && pendingStudents.length > 0 && (
+          <div className="px-6 py-4 bg-gray-50 border-t flex items-center justify-between">
+            <div className="text-sm text-gray-600">
+              Showing Page <span className="font-semibold">{currentPage}</span> of <span className="font-semibold">{totalPages}</span>
+            </div>
+            <div className="inline-flex gap-2">
+              <button
+                onClick={() => handlePageChange(currentPage - 1)}
+                disabled={currentPage === 1 || loading}
+                className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              >
+                Previous
+              </button>
+              <button
+                onClick={() => handlePageChange(currentPage + 1)}
+                disabled={currentPage === totalPages || loading}
+                className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              >
+                Next
+              </button>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
