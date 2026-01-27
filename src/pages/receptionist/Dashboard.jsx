@@ -9,41 +9,65 @@ const ReceptionistDashboard = () => {
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    const fetchDashboardData = async () => {
-      try {
-        setLoading(true);
-        const [summaryRes, pendingRes] = await Promise.all([
-          api.get("/api/reception/dashboard"),
-          api.get("/api/reception/students/pending-fees")
-        ]);
-        
-        setSummary(summaryRes.data);
-        // Backend returns result.rows directly based on your controller
-        setPendingStudents(Array.isArray(pendingRes.data) ? pendingRes.data : []);
-      } catch (err) {
-        setError("Failed to load dashboard data");
-        console.error("Dashboard Fetch Error:", err);
-      } finally {
-        setLoading(false);
-      }
-    };
+  // Search States
+  const [searchPhone, setSearchPhone] = useState("");
+  const [isSearching, setIsSearching] = useState(false);
 
+  const fetchDashboardData = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const [summaryRes, pendingRes] = await Promise.all([
+        api.get("/api/reception/dashboard"),
+        api.get("/api/reception/students/pending-fees")
+      ]);
+      
+      setSummary(summaryRes.data);
+      setPendingStudents(Array.isArray(pendingRes.data) ? pendingRes.data : []);
+    } catch (err) {
+      setError("Failed to load dashboard data");
+      console.error("Dashboard Fetch Error:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
     fetchDashboardData();
   }, []);
 
-  /**
-   * Modified Navigation Logic
-   * Ensures the correct ID is sent to the Payments page
-   */
+  // Manual Search Handler
+  const handleSearch = async (e) => {
+    if (e) e.preventDefault(); // Prevents page reload
+
+    if (!searchPhone.trim()) {
+      return fetchDashboardData();
+    }
+
+    try {
+      setIsSearching(true);
+      setError(null);
+      const response = await api.get(`/api/reception/students/pending-fees/search?phone=${searchPhone}`);
+      
+      // Use the data returned from your getStudentByPendingByPhone query
+      setPendingStudents(Array.isArray(response.data) ? response.data : []);
+    } catch (err) {
+      console.error("Search Error:", err);
+      setError("Error searching for student.");
+    } finally {
+      setIsSearching(false);
+    }
+  };
+
+  const handleClearSearch = () => {
+    setSearchPhone("");
+    fetchDashboardData();
+  };
+
   const handleCollectFee = (student) => {
-    console.log("Passing student to payments:", student);
-    
     navigate("/receptionist/payments", { 
       state: { 
         selectedStudent: {
-          // If your SQL query uses 'admission_id' as 'admissionId' use that, 
-          // otherwise fallback to 'id' or 'admission_id'
           admissionId: student.admissionId || student.admission_id || student.id, 
           studentName: student.studentName || student.name,
           batchName: student.batchName,
@@ -81,13 +105,48 @@ const ReceptionistDashboard = () => {
         </div>
       )}
 
-      {/* Fee Defaulters List */}
+      {/* Fee Defaulters List Container */}
       <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-        <div className="p-4 border-b bg-gray-50 flex justify-between items-center">
+        <div className="p-4 border-b bg-gray-50 flex flex-col md:flex-row justify-between items-center gap-4">
           <h2 className="font-semibold text-gray-700">Fee Defaulters List</h2>
-          <span className="text-xs bg-red-100 text-red-600 px-2 py-1 rounded-full font-bold uppercase">
-            Payment Required
-          </span>
+
+          {/* Search Form */}
+          <form onSubmit={handleSearch} className="flex items-center gap-2 w-full md:w-auto">
+            <div className="relative flex-grow">
+              <input
+                type="text"
+                placeholder="Search phone number..."
+                value={searchPhone}
+                onChange={(e) => setSearchPhone(e.target.value)}
+                className="pl-10 pr-10 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none w-full md:w-64"
+              />
+              <span className="absolute left-3 top-2.5 text-gray-400">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
+              </span>
+              
+              {searchPhone && (
+                <button
+                  type="button"
+                  onClick={handleClearSearch}
+                  className="absolute right-3 top-2.5 text-gray-400 hover:text-gray-600"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                  </svg>
+                </button>
+              )}
+            </div>
+
+            <button
+              type="submit"
+              disabled={isSearching}
+              className="bg-blue-600 text-white px-5 py-2 rounded-lg text-sm font-bold hover:bg-blue-700 transition-all disabled:bg-blue-300 flex items-center gap-2"
+            >
+              {isSearching ? "Searching..." : "Search"}
+            </button>
+          </form>
         </div>
         
         <div className="overflow-x-auto">
@@ -105,12 +164,12 @@ const ReceptionistDashboard = () => {
               {loading ? (
                 <tr>
                   <td colSpan="5" className="p-10 text-center text-gray-400 italic">
-                    Loading pending records...
+                    Loading records...
                   </td>
                 </tr>
               ) : pendingStudents.length > 0 ? (
                 pendingStudents.map((s) => (
-                  <tr key={s.studentId || s.id} className="hover:bg-blue-50/50 transition-colors">
+                  <tr key={s.admissionId} className="hover:bg-blue-50/50 transition-colors">
                     <td className="px-6 py-4 font-medium text-gray-900">{s.studentName}</td>
                     <td className="px-6 py-4 text-sm text-gray-600">{s.batchName}</td>
                     <td className="px-6 py-4 text-sm text-gray-600 font-mono">{s.phone}</td>
@@ -132,7 +191,7 @@ const ReceptionistDashboard = () => {
               ) : (
                 <tr>
                   <td colSpan="5" className="p-10 text-center text-gray-500">
-                    No students with pending fees found.
+                    {searchPhone ? "No matching students with pending fees." : "No pending fees found."}
                   </td>
                 </tr>
               )}
