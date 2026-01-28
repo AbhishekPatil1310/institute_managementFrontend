@@ -8,38 +8,66 @@ const Admissions = () => {
 
   const [batches, setBatches] = useState([]);
   const [installments, setInstallments] = useState([]);
+  const [references, setReferences] = useState([]);
+
   const [batchId, setBatchId] = useState("");
   const [installmentId, setInstallmentId] = useState("");
-  const [paymentSource, setPaymentSource] = useState("CASH");
+  const [referenceId, setReferenceId] = useState("");
+
+  const [paymentSource] = useState("CASH");
   const [error, setError] = useState(null);
 
+  // Fetch batches
   useEffect(() => {
-    api.get("/api/admin/batches")
+    api
+      .get("/api/admin/batches")
       .then((res) => setBatches(res.data))
       .catch(() => setError("Failed to load batches"));
   }, []);
 
+  // Fetch installments when batch changes
   useEffect(() => {
-    if (!batchId) return;
+    if (!batchId) {
+      setInstallments([]);
+      setInstallmentId("");
+      return;
+    }
+
     api
       .get(`/api/reception/batches/${batchId}/installments`)
-      .then((res) => setInstallments(res.data));
+      .then((res) => setInstallments(res.data))
+      .catch(() => setError("Failed to load installments"));
   }, [batchId]);
+
+  // Fetch references
+  useEffect(() => {
+    api
+      .get("/api/reception/references")
+      .then((res) => setReferences(res.data))
+      .catch(() => setError("Failed to load references"));
+  }, []);
 
   const submit = async () => {
     setError(null);
+
+    if (!studentId || !batchId || !installmentId) {
+      setError("Please select batch and installment");
+      return;
+    }
+
     try {
       await api.post("/api/reception/admissions", {
         studentId,
         batchId,
         installmentId,
+        referenceId: referenceId || null,
         paymentSource,
       });
+
       alert("Admission completed");
     } catch (err) {
       setError(
-        err?.response?.data?.message ||
-          "Admission failed"
+        err?.response?.data?.message || "Admission failed"
       );
     }
   };
@@ -53,6 +81,7 @@ const Admissions = () => {
       {error && <p className="text-red-600 mb-3">{error}</p>}
 
       <div className="bg-white p-4 rounded shadow w-full space-y-3">
+        {/* Batch */}
         <select
           value={batchId}
           onChange={(e) => setBatchId(e.target.value)}
@@ -66,10 +95,12 @@ const Admissions = () => {
           ))}
         </select>
 
+        {/* Installment */}
         <select
           value={installmentId}
           onChange={(e) => setInstallmentId(e.target.value)}
           className="border px-3 py-2 rounded w-full"
+          disabled={!batchId}
         >
           <option value="">Select Installment</option>
           {installments.map((i) => (
@@ -79,6 +110,19 @@ const Admissions = () => {
           ))}
         </select>
 
+        {/* Reference (Optional) */}
+        <select
+          value={referenceId}
+          onChange={(e) => setReferenceId(e.target.value)}
+          className="border px-3 py-2 rounded w-full"
+        >
+          <option value="">Select Reference (Optional)</option>
+          {references.map((r) => (
+            <option key={r.id} value={r.id}>
+              {r.name} (-₹{r.concession})
+            </option>
+          ))}
+        </select>
 
         <button
           onClick={submit}
