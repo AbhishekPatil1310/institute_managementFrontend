@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import api from "../../services/api";
 
-const MONTH_OPTIONS = ["1", "2", "3","4","NO Limit"];
+const MONTH_OPTIONS = ["1", "2", "3","4","NO Limit","No installment"];
 
 const Installments = () => {
   const [batches, setBatches] = useState([]);
