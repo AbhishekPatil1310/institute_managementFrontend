@@ -89,6 +89,9 @@ const StudentLayout = () => {
           <NavLink to="/student/results" className={linkClass}>
             result
           </NavLink>
+          <NavLink to="/student/notes" className={linkClass}>
+            Notes
+          </NavLink>
           <NavLink to="/student/profile/change-password" className={linkClass}>
             Change Password
           </NavLink>

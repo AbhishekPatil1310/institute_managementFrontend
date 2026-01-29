@@ -37,6 +37,9 @@ const FeeStatus = lazy(() =>
 
 const StudentMarks = lazy(() => import("../pages/student/Marks"));
 
+const Mynotes = lazy(() => import("../pages/student/MyNotes"));
+
+
 
 /* ---------- receptionist ---------- */
 const ReceptionistDashboard = lazy(() =>
@@ -93,6 +96,8 @@ const FinancialReports = lazy(() =>
 const AttendanceReports = lazy(() =>
   import("../pages/admin/reports/Attendance")
 );
+const NotesAdmin = lazy(() => import("../pages/admin/Notes"));
+
 
 const Subjects = lazy(() => import("../pages/admin/Subjects"));
 
@@ -124,6 +129,7 @@ export const studentRoutes = {
     { path: "profile", element: <StudentProfile /> },
     { path: "fees", element: <FeeStatus /> },
     { path: "results", element: <StudentMarks /> },
+    { path: "notes", element: <Mynotes /> },
     {
       path: "profile/change-password",
       element: <ChangePassword />,
@@ -175,6 +181,7 @@ export const adminRoutes = {
     { path: "exams", element: <Exams /> },
     { path: "attendance-qr", element: <AttendanceQR /> },
     { path: "subjects", element: <Subjects /> },
+    { path: "notes", element: <NotesAdmin /> },
     {
       path: "reports/financial",
       element: <FinancialReports />,
