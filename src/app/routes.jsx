@@ -54,6 +54,10 @@ const Payments = lazy(() =>
 const Dues = lazy(() =>
   import("../pages/receptionist/Dues")
 );
+const Notes = lazy(() =>
+  import("../pages/receptionist/notes")
+);
+
 
 
 /* ---------- dtp operator ---------- */
@@ -155,6 +159,7 @@ export const receptionistRoutes = {
     { path: "admissions", element: <Admissions /> },
     { path: "payments", element: <Payments /> },
     { path: "dues", element: <Dues /> },
+    { path: "notes", element: < Notes/> },
   ],
 };
 

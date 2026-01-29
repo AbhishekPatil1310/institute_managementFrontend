@@ -92,6 +92,9 @@ const ReceptionistLayout = () => {
           <NavLink to="/receptionist/dues" className={linkClass}>
             Dues
           </NavLink>
+          <NavLink to="/receptionist/notes" className={linkClass}>
+            notes
+          </NavLink>
         </nav>
 
         <div className="p-4 absolute bottom-0 w-64">
