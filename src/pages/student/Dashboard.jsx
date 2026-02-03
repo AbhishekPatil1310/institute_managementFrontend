@@ -24,7 +24,7 @@ const StudentProfile = () => {
       {/* Profile Header */}
       <div className="bg-white p-6 rounded-2xl shadow-sm border flex flex-col md:flex-row items-center gap-6">
         <div className="h-24 w-24 bg-indigo-100 rounded-full flex items-center justify-center text-3xl font-bold text-indigo-600">
-          {profile.name?.charAt(0)}
+          {profile.data.name?.charAt(0)}
         </div>
         <div className="text-center md:text-left flex-1">
           <h1 className="text-2xl font-bold text-gray-800">{profile.data.name}</h1>
