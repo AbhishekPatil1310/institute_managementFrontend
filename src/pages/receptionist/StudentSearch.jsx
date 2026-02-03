@@ -18,7 +18,8 @@ const StudentSearch = () => {
     setError(null);
     try {
       const res = await api.get(`/api/reception/students/search?q=${phone}`);
-      setStudents(res.data);
+      setStudents(res.data.data);
+      console.log('student is:', res.data)
       if (res.data.length === 0) setError("No students found matching that number.");
     } catch (err) {
       setError("Search failed. Please try again.");

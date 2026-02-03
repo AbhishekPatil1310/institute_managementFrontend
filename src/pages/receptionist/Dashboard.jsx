@@ -59,7 +59,7 @@ const ReceptionistDashboard = () => {
       const response = await api.get(`/api/reception/students/pending-fees/search?phone=${searchPhone}`);
       
       // Search results usually bypass standard pagination in simple implementations
-      setPendingStudents(Array.isArray(response.data) ? response.data : []);
+      setPendingStudents(Array.isArray(response.data.data) ? response.data.data : []);
       setTotalPages(1); 
     } catch (err) {
       console.error("Search Error:", err);
