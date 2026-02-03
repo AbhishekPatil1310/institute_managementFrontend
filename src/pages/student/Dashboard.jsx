@@ -11,6 +11,7 @@ const StudentProfile = () => {
       .then((res) => {
         setProfile(res.data);
         setLoading(false);
+        console.log('res data for profile: ',res.data.data.name)
       })
       .catch(() => setLoading(false));
   }, []);
@@ -26,10 +27,10 @@ const StudentProfile = () => {
           {profile.name?.charAt(0)}
         </div>
         <div className="text-center md:text-left flex-1">
-          <h1 className="text-2xl font-bold text-gray-800">{profile.name}</h1>
+          <h1 className="text-2xl font-bold text-gray-800">{profile.data.name}</h1>
           <p className="text-gray-500">{profile.email}</p>
           <div className="mt-2 inline-block bg-indigo-50 text-indigo-700 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider">
-            ID: {profile.student_code}
+            ID: {profile.data.student_code}
           </div>
         </div>
       </div>
@@ -42,11 +43,11 @@ const StudentProfile = () => {
             <div className="grid grid-cols-2 gap-4 text-sm">
               <div>
                 <p className="text-gray-400">Phone</p>
-                <p className="font-medium">{profile.phone || "N/A"}</p>
+                <p className="font-medium">{profile.data.phone || "N/A"}</p>
               </div>
               <div>
                 <p className="text-gray-400">Joined On</p>
-                <p className="font-medium">{new Date(profile.created_at).toLocaleDateString()}</p>
+                <p className="font-medium">{new Date(profile.data.created_at).toLocaleDateString()}</p>
               </div>
             </div>
           </div>
