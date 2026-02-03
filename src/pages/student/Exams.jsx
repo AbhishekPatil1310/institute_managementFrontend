@@ -15,7 +15,7 @@ const Exams = () => {
         setLoading(true);
         // Calls: app.use("/api/students") + router.get("/batches")
         const res = await api.get("/api/students/students/batches");
-        setBatches(Array.isArray(res.data) ? res.data : []);
+        setBatches(Array.isArray(res.data.batches) ? res.data.batches : []);
       } catch (err) {
         console.error("Error fetching batches:", err);
         setError("Failed to load your batches.");
