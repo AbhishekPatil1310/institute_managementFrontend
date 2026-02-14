@@ -60,7 +60,7 @@ const StudentProfile = () => {
           
           <div className="p-3 bg-white border-4 border-indigo-50 rounded-xl shadow-inner">
             <QRCodeSVG 
-              value={profile.student_code} // This matches the student_code your Clerk scans
+              value={profile.data.student_code} // This matches the student_code your Clerk scans
               size={160}
               level={"H"} // High error correction
               includeMargin={true}
