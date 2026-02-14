@@ -15,9 +15,14 @@ const Admissions = () => {
   const [referenceId, setReferenceId] = useState("");
 
   const [paymentSource] = useState("CASH");
-  const [error, setError] = useState(null);
 
-  // Fetch batches
+  const [error, setError] = useState(null);
+  const [success, setSuccess] = useState(null);
+  const [loading, setLoading] = useState(false);
+
+  /* ========================
+     Fetch Batches
+  ======================== */
   useEffect(() => {
     api
       .get("/api/admin/batches")
@@ -25,7 +30,9 @@ const Admissions = () => {
       .catch(() => setError("Failed to load batches"));
   }, []);
 
-  // Fetch installments when batch changes
+  /* ========================
+     Fetch Installments
+  ======================== */
   useEffect(() => {
     if (!batchId) {
       setInstallments([]);
@@ -39,7 +46,9 @@ const Admissions = () => {
       .catch(() => setError("Failed to load installments"));
   }, [batchId]);
 
-  // Fetch references
+  /* ========================
+     Fetch References
+  ======================== */
   useEffect(() => {
     api
       .get("/api/reception/references")
@@ -47,8 +56,12 @@ const Admissions = () => {
       .catch(() => setError("Failed to load references"));
   }, []);
 
+  /* ========================
+     Submit Admission
+  ======================== */
   const submit = async () => {
     setError(null);
+    setSuccess(null);
 
     if (!studentId || !batchId || !installmentId) {
       setError("Please select batch and installment");
@@ -56,6 +69,8 @@ const Admissions = () => {
     }
 
     try {
+      setLoading(true);
+
       await api.post("/api/reception/admissions", {
         studentId,
         batchId,
@@ -64,71 +79,114 @@ const Admissions = () => {
         paymentSource,
       });
 
-      alert("Admission completed");
+      setSuccess("Admission completed successfully");
+
+      // Reset form
+      setBatchId("");
+      setInstallmentId("");
+      setReferenceId("");
     } catch (err) {
-      setError(
-        err?.response?.data?.message || "Admission failed"
-      );
+      setError(err?.response?.data?.message || "Admission failed");
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <div>
-      <h1 className="text-xl font-semibold mb-4">
+    <div className="max-w-xl mx-auto">
+      {/* Page Title */}
+      <h1 className="text-2xl font-semibold mb-6 text-gray-800">
         Student Admission
       </h1>
 
-      {error && <p className="text-red-600 mb-3">{error}</p>}
+      {/* Error Message */}
+      {error && (
+        <div className="bg-red-100 text-red-700 px-4 py-2 rounded mb-4">
+          {error}
+        </div>
+      )}
 
-      <div className="bg-white p-4 rounded shadow w-full space-y-3">
+      {/* Success Message */}
+      {success && (
+        <div className="bg-green-100 text-green-700 px-4 py-2 rounded mb-4">
+          {success}
+        </div>
+      )}
+
+      {/* Form Card */}
+      <div className="bg-white p-6 rounded-lg shadow space-y-5">
+
         {/* Batch */}
-        <select
-          value={batchId}
-          onChange={(e) => setBatchId(e.target.value)}
-          className="border px-3 py-2 rounded w-full"
-        >
-          <option value="">Select Batch</option>
-          {batches.map((b) => (
-            <option key={b.id} value={b.id}>
-              {b.name}
-            </option>
-          ))}
-        </select>
+        <div>
+          <label className="block text-sm font-medium mb-1 text-gray-700">
+            Select Batch
+          </label>
+
+          <select
+            value={batchId}
+            onChange={(e) => setBatchId(e.target.value)}
+            className="border px-3 py-2 rounded w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
+          >
+            <option value="">Choose a batch</option>
+
+            {batches.map((b) => (
+              <option key={b.id} value={b.id}>
+                {b.name}
+              </option>
+            ))}
+          </select>
+        </div>
 
         {/* Installment */}
-        <select
-          value={installmentId}
-          onChange={(e) => setInstallmentId(e.target.value)}
-          className="border px-3 py-2 rounded w-full"
-          disabled={!batchId}
-        >
-          <option value="">Select Installment</option>
-          {installments.map((i) => (
-            <option key={i.id} value={i.id}>
-              {i.months} Months (+₹{i.surcharge})
-            </option>
-          ))}
-        </select>
+        <div>
+          <label className="block text-sm font-medium mb-1 text-gray-700">
+            Select Installment
+          </label>
 
-        {/* Reference (Optional) */}
-        <select
-          value={referenceId}
-          onChange={(e) => setReferenceId(e.target.value)}
-          className="border px-3 py-2 rounded w-full"
-        >
-          <option value="">Select Reference (Optional)</option>
-          {references.map((r) => (
-            <option key={r.id} value={r.id}>
-              {r.name} (-₹{r.concession})
-            </option>
-          ))}
-        </select>
+          <select
+            value={installmentId}
+            onChange={(e) => setInstallmentId(e.target.value)}
+            disabled={!batchId}
+            className="border px-3 py-2 rounded w-full disabled:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          >
+            <option value="">Choose installment</option>
 
+            {installments.map((i) => (
+              <option key={i.id} value={i.id}>
+                {i.months} Months (+₹{i.surcharge})
+              </option>
+            ))}
+          </select>
+        </div>
+
+        {/* Reference */}
+        <div>
+          <label className="block text-sm font-medium mb-1 text-gray-700">
+            Reference (Optional)
+          </label>
+
+          <select
+            value={referenceId}
+            onChange={(e) => setReferenceId(e.target.value)}
+            className="border px-3 py-2 rounded w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
+          >
+            <option value="">No reference</option>
+
+            {references.map((r) => (
+              <option key={r.id} value={r.id}>
+                {r.name} (-₹{r.concession})
+              </option>
+            ))}
+          </select>
+        </div>
+
+        {/* Submit Button */}
         <button
           onClick={submit}
-          className="bg-blue-600 text-white px-4 py-2 rounded w-full"
+          disabled={loading}
+          className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded w-full font-medium disabled:opacity-60 disabled:cursor-not-allowed transition"
         >
-          Confirm Admission
+          {loading ? "Processing..." : "Confirm Admission"}
         </button>
       </div>
     </div>
