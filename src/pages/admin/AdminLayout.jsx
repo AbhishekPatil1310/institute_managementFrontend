@@ -65,7 +65,7 @@ const AdminLayout = () => {
     <div className="min-h-screen flex bg-neutral">
       {/* Sidebar */}
       <aside
-        className={`bg-white shadow-lg w-64 fixed top-0 left-0 h-full z-50 transform ${
+        className={`bg-white shadow-lg w-64 fixed top-0 left-0 h-full z-50 transform flex flex-col ${
           isSidebarOpen ? "translate-x-0" : "-translate-x-full"
         } transition-transform duration-300 ease-in-out md:translate-x-0`}
       >
@@ -77,7 +77,7 @@ const AdminLayout = () => {
         </div>
         <p className="text-sm text-text-secondary mt-1 px-6">{user?.email}</p>
 
-        <nav className="p-4 space-y-2">
+        <nav className="p-4 space-y-2 flex-1 overflow-y-auto min-h-0">
           <NavLink to="/admin/dashboard" className={linkClass} end>
             Dashboard
           </NavLink>
@@ -95,9 +95,6 @@ const AdminLayout = () => {
           </NavLink>
           <NavLink to="/admin/exams" className={linkClass}>
             Exams
-          </NavLink>
-          <NavLink to="/admin/attendance-qr" className={linkClass}>
-            Attendance QR
           </NavLink>
           <div>
             <p className="px-4 pt-4 pb-2 text-xs font-semibold text-text-secondary uppercase">
@@ -118,7 +115,7 @@ const AdminLayout = () => {
           </div>
         </nav>
 
-        <div className="p-4 absolute bottom-0 w-64">
+        <div className="p-4 border-t border-neutral-dark shrink-0">
           <button
             onClick={handleLogout}
             className="w-full text-left px-4 py-2 text-red-600 hover:bg-red-100 rounded-lg transition-colors duration-200"
