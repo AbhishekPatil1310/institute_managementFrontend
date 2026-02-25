@@ -52,8 +52,7 @@ const StudentRegister = () => {
             Full Name
           </label>
           <input
-            name="name"
-            placeholder="hi"
+            name="name"            
             onChange={handleChange}
             className="w-full border border-neutral-dark px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
             required
