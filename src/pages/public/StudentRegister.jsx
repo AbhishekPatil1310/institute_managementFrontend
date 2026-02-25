@@ -53,7 +53,6 @@ const StudentRegister = () => {
           </label>
           <input
             name="name"
-            placeholder="John Doe"
             onChange={handleChange}
             className="w-full border border-neutral-dark px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
             required
@@ -67,7 +66,6 @@ const StudentRegister = () => {
           <input
             name="email"
             type="email"
-            placeholder="john.doe@example.com"
             onChange={handleChange}
             className="w-full border border-neutral-dark px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
           />
@@ -79,7 +77,6 @@ const StudentRegister = () => {
           </label>
           <input
             name="phone"
-            placeholder="123-456-7890"
             onChange={handleChange}
             className="w-full border border-neutral-dark px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
             required
