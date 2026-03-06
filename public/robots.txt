@@ -1,0 +1,40 @@
+# Robots.txt for Sharda Academy Admission Management System
+# https://www.shardaacademy.co.in/
+
+# Allow all search engines to crawl the site
+User-agent: *
+Allow: /
+Disallow: /admin/
+Disallow: /private/
+Disallow: /api/
+Disallow: /.well-known/
+Disallow: /node_modules/
+Disallow: /src/
+Disallow: /build/
+Disallow: /dist/
+
+# Crawl delay for all bots (in seconds)
+Crawl-delay: 1
+
+# Request rate for Googlebot
+User-agent: Googlebot
+Crawl-delay: 0
+Allow: /
+
+# Specific rules for other search engines
+User-agent: Bingbot
+Crawl-delay: 1
+Allow: /
+
+# Block bad bots
+User-agent: MJ12bot
+Disallow: /
+
+User-agent: AhrefsBot
+Disallow: /
+
+User-agent: SemrushBot
+Disallow: /
+
+# Sitemap location
+Sitemap: https://www.shardaacademy.co.in/sitemap.xml
