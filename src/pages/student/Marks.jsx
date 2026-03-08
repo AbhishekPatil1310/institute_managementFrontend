@@ -24,7 +24,7 @@ const StudentMarks = () => {
   if (loading) return <div className="p-8 text-center text-gray-500">Fetching your results...</div>;
 
   return (
-    <div className="max-w-4xl mx-auto space-y-6 p-2">
+    <div className="max-w-4xl mx-auto space-y-6 p-4 sm:p-2">
       <header className="mb-6">
         <h2 className="text-2xl font-bold text-gray-800">Academic Performance</h2>
         <p className="text-sm text-gray-500">View your marks and subject-wise breakdown</p>
@@ -65,7 +65,7 @@ const StudentMarks = () => {
 
               {/* Subject Breakdown (Expandable) */}
               {expandedExam === idx && (
-                <div className="border-t border-gray-50 bg-gray-50/50 p-5 animate-in slide-in-from-top-2 duration-300">
+                <div className="border-t border-gray-50 bg-gray-50/50 p-5 animate-in slide-in-from-top-2 duration-300 overflow-x-auto">
                   <table className="w-full text-left">
                     <thead>
                       <tr className="text-[10px] uppercase text-gray-400 font-black border-b border-gray-200">

@@ -103,7 +103,7 @@ const Exams = () => {
           {loading ? (
             <div className="text-center p-10 text-gray-500">Fetching exams...</div>
           ) : (
-            <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+            <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-x-auto">
               <table className="w-full text-left">
                 <thead className="bg-gray-50 text-gray-600 uppercase text-xs tracking-widest">
                   <tr>

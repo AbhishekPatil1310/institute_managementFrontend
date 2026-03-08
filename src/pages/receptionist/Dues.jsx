@@ -206,7 +206,7 @@ const Dues = () => {
               {d.phone}
             </p>
 
-            <div className="grid grid-cols-3 gap-2 pt-4 border-t">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 pt-4 border-t">
 
               <div className="text-center">
                 <p className="text-[10px] text-gray-500 uppercase font-bold">

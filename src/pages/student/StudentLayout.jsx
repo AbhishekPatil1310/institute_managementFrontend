@@ -115,7 +115,7 @@ const StudentLayout = () => {
           </button>
           <h1 className="text-xl font-bold text-primary">Student Portal</h1>
         </header>
-        <main className="flex-1 p-8 overflow-y-auto md:ml-64">
+        <main className="flex-1 p-4 sm:p-6 md:p-8 overflow-y-auto md:ml-64">
           <Outlet />
         </main>
       </div>

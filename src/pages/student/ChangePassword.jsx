@@ -50,8 +50,8 @@ const ChangePassword = () => {
   };
 
   return (
-    <div className="max-w-md mx-auto mt-10">
-      <div className="bg-white p-8 rounded-2xl shadow-sm border border-gray-100">
+    <div className="max-w-md mx-auto mt-10 p-4">
+      <div className="bg-white p-4 sm:p-8 rounded-2xl shadow-sm border border-gray-100">
         <h2 className="text-2xl font-bold text-gray-800 mb-2">Change Password</h2>
         <p className="text-sm text-gray-500 mb-6">
           Keep your account secure by updating your password regularly.

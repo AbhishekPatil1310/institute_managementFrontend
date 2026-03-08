@@ -101,7 +101,7 @@ const AdminNotes = () => {
       </div>
 
       {/* MAIN CONTENT */}
-      <main className="flex-1 flex flex-col min-w-0 p-4 lg:p-8">
+      <main className="flex-1 flex flex-col min-w-0 p-4 md:p-6 lg:p-8">
         {selectedStudent ? (
           <div className="flex flex-col h-full">
             <header className="mb-6">

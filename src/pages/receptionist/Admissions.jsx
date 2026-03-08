@@ -93,9 +93,9 @@ const Admissions = () => {
   };
 
   return (
-    <div className="max-w-xl mx-auto">
+    <div className="max-w-xl mx-auto p-4">
       {/* Page Title */}
-      <h1 className="text-2xl font-semibold mb-6 text-gray-800">
+      <h1 className="text-xl sm:text-2xl font-semibold mb-6 text-gray-800">
         Student Admission
       </h1>
 
@@ -114,7 +114,7 @@ const Admissions = () => {
       )}
 
       {/* Form Card */}
-      <div className="bg-white p-6 rounded-lg shadow space-y-5">
+      <div className="bg-white p-4 sm:p-6 rounded-lg shadow space-y-5">
 
         {/* Batch */}
         <div>

@@ -244,7 +244,7 @@ const StudentSearch = () => {
               )}
 
               {/* Bottom Actions */}
-              <div className="flex gap-3 mt-4 border-t pt-3 flex-wrap">
+              <div className="flex flex-wrap gap-2 sm:gap-3 mt-4 border-t pt-3">
 
                 {/* Edit */}
                 {editingId !== studentId && (
@@ -271,7 +271,7 @@ const StudentSearch = () => {
                         },
                       })
                     }
-                    className="bg-green-50 text-green-600 hover:bg-green-100 px-4 py-1.5 rounded font-semibold"
+                    className="bg-green-50 text-green-600 hover:bg-green-100 px-3 sm:px-4 py-1.5 rounded font-semibold text-sm"
                   >
                     Collect Fee
                   </button>
@@ -284,7 +284,7 @@ const StudentSearch = () => {
                       `/receptionist/admissions?studentId=${studentId}`
                     )
                   }
-                  className="bg-blue-50 text-blue-600 hover:bg-blue-100 px-4 py-1.5 rounded font-semibold"
+                  className="bg-blue-50 text-blue-600 hover:bg-blue-100 px-3 sm:px-4 py-1.5 rounded font-semibold text-sm"
                 >
                   + Add New Batch
                 </button>

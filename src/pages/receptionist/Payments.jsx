@@ -147,7 +147,7 @@ const Payments = () => {
   };
 
   return (
-    <div className="p-6 bg-gray-50 min-h-screen max-w-7xl mx-auto">
+    <div className="p-4 sm:p-6 bg-gray-50 min-h-screen max-w-7xl mx-auto">
 
       {/* ========================
           Page Title
@@ -200,7 +200,7 @@ const Payments = () => {
 
             <form
               onSubmit={handleCollectFee}
-              className="grid grid-cols-1 md:grid-cols-4 gap-4 items-end"
+              className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 items-end"
             >
 
               {/* Receipt */}

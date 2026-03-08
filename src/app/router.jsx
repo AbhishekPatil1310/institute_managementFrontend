@@ -2,6 +2,7 @@ import { createBrowserRouter } from "react-router-dom";
 import App from "./App"; // Import the App component
 import RequireAuth from "../auth/RequireAuth";
 import RequireRole from "../auth/RequireRole";
+import RequirePasswordChange from "../auth/RequirePasswordChange";
 
 import {
   publicRoutes,
@@ -23,7 +24,9 @@ export const router = createBrowserRouter([
           {
             path: studentRoutes.path,
             element: (
-              <RequireRole role="STUDENT">{studentRoutes.layout}</RequireRole>
+              <RequireRole role="STUDENT">
+                <RequirePasswordChange>{studentRoutes.layout}</RequirePasswordChange>
+              </RequireRole>
             ),
             children: studentRoutes.children,
           },

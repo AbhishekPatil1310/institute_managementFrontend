@@ -1,4 +1,5 @@
 import { lazy } from "react";
+import { Navigate } from "react-router-dom";
 
 /* ---------- public ---------- */
 const Login = lazy(() => import("../pages/public/Login"));
@@ -124,6 +125,7 @@ export const studentRoutes = {
   path: "/student",
   layout: <StudentLayout />,
   children: [
+    { index: true, element: <Navigate to="dashboard" replace /> },
     { path: "dashboard", element: <StudentDashboard /> },
     { path: "exams", element: <StudentExams /> },
     { path: "profile", element: <StudentProfile /> },
@@ -141,6 +143,7 @@ export const dtpRoutes = {
   path: "/dtp",
   layout: <DTPLayout />,
   children: [
+    { index: true, element: <Navigate to="dashboard" replace /> },
     { path: "dashboard", element: <DTPDashboard /> },
     { path: "marks-entry", element: <DTPMarksEntry /> },
   ],
@@ -150,6 +153,7 @@ export const clerkRoutes = {
   path: "/clerk",
   layout: <ClerkLayout />,
   children: [
+    { index: true, element: <Navigate to="attendance-scan" replace /> },
     { path: "attendance-scan", element: <AttendanceScan /> },
     { path: "student-attendance", element: <AttendanceStatus /> },
   ],
@@ -160,6 +164,7 @@ export const receptionistRoutes = {
   path: "/receptionist",
   layout: <ReceptionistLayout />,
   children: [
+    { index: true, element: <Navigate to="dashboard" replace /> },
     { path: "dashboard", element: <ReceptionistDashboard /> },
     { path: "students/search", element: <StudentSearch /> },
     { path: "admissions", element: <Admissions /> },
@@ -173,6 +178,7 @@ export const adminRoutes = {
   path: "/admin",
   layout: <AdminLayout />,
   children: [
+    { index: true, element: <Navigate to="dashboard" replace /> },
     { path: "dashboard", element: <AdminDashboard /> },
     { path: "batches", element: <Batches /> },
     { path: "installments", element: <Installments /> },

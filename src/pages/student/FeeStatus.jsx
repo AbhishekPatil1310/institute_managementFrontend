@@ -25,14 +25,14 @@ const FeeStatus = () => {
   const totalDue = feeData.reduce((acc, curr) => acc + parseFloat(curr.pendingAmount), 0);
 
   return (
-    <div className="max-w-4xl mx-auto space-y-6 p-2">
+    <div className="max-w-4xl mx-auto space-y-6 p-4 sm:p-2">
       <header>
         <h2 className="text-2xl font-bold text-gray-800">My Fee Status</h2>
         <p className="text-sm text-gray-500">Track your payments and outstanding balances</p>
       </header>
 
       {/* Summary Card */}
-      <div className="bg-gradient-to-r from-indigo-600 to-blue-500 p-6 rounded-2xl shadow-lg text-white">
+      <div className="bg-gradient-to-r from-indigo-600 to-blue-500 p-4 sm:p-6 rounded-2xl shadow-lg text-white">
         <div className="flex justify-between items-center">
           <div>
             <p className="text-indigo-100 text-sm font-medium uppercase tracking-wider">Total Outstanding Balance</p>
@@ -52,7 +52,7 @@ const FeeStatus = () => {
         {feeData.length > 0 ? (
           feeData.map((item, idx) => (
             <div key={idx} className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-              <div className="p-5">
+              <div className="p-4 sm:p-5">
                 <div className="flex justify-between items-start mb-4">
                   <div>
                     <h5 className="font-bold text-lg text-gray-800">{item.batchName}</h5>
@@ -71,7 +71,7 @@ const FeeStatus = () => {
                   ></div>
                 </div>
 
-                <div className="grid grid-cols-3 gap-2">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
                   <div className="text-center">
                     <p className="text-[10px] uppercase text-gray-400 font-bold">Total Fee</p>
                     <p className="font-bold text-gray-700 text-sm">₹{parseFloat(item.totalFee).toLocaleString()}</p>

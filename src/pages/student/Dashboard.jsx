@@ -20,9 +20,9 @@ const StudentProfile = () => {
   if (!profile) return <div className="p-8 text-center text-red-500">Error loading data</div>;
 
   return (
-    <div className="max-w-4xl mx-auto space-y-6">
+    <div className="max-w-4xl mx-auto space-y-6 p-4 sm:p-2">
       {/* Profile Header */}
-      <div className="bg-white p-6 rounded-2xl shadow-sm border flex flex-col md:flex-row items-center gap-6">
+      <div className="bg-white p-4 sm:p-6 rounded-2xl shadow-sm border flex flex-col md:flex-row items-center gap-6">
         <div className="h-24 w-24 bg-indigo-100 rounded-full flex items-center justify-center text-3xl font-bold text-indigo-600">
           {profile.data.name?.charAt(0)}
         </div>
@@ -40,7 +40,7 @@ const StudentProfile = () => {
         <div className="md:col-span-2 space-y-6">
           <div className="bg-white p-6 rounded-2xl shadow-sm border">
             <h3 className="font-bold text-gray-700 mb-4 border-b pb-2">Academic Information</h3>
-            <div className="grid grid-cols-2 gap-4 text-sm">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
               <div>
                 <p className="text-gray-400">Phone</p>
                 <p className="font-medium">{profile.data.phone || "N/A"}</p>

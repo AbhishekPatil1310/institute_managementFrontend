@@ -54,7 +54,7 @@ const AttendanceScan = () => {
   };
 
   return (
-    <div className="max-w-md">
+    <div className="max-w-md mx-auto p-4">
       <h1 className="text-xl font-semibold mb-4">
         Attendance Scan
       </h1>

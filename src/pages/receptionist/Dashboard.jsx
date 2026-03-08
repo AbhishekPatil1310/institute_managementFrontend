@@ -126,10 +126,10 @@ const ReceptionistDashboard = () => {
   };
 
   return (
-    <div className="p-6 bg-gray-50 min-h-screen">
+    <div className="p-4 sm:p-6 bg-gray-50 min-h-screen">
 
       {/* Title */}
-      <h1 className="text-2xl font-bold text-gray-800 mb-6">
+      <h1 className="text-xl sm:text-2xl font-bold text-gray-800 mb-6">
         Reception Dashboard
       </h1>
 

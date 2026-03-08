@@ -62,7 +62,7 @@ const MyNotes = () => {
 
   return (
     <div className="max-w-5xl mx-auto p-4 md:p-8 bg-gray-50 min-h-screen">
-      <header className="mb-8 flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <header className="mb-8 flex flex-col md:flex-row md:items-center justify-between gap-4 p-4 md:p-0">
         <div>
           <h1 className="text-2xl font-bold text-gray-800 flex items-center gap-2">
             <BookOpen className="text-green-600" /> My Issued Notes

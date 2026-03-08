@@ -158,7 +158,7 @@ const Installments = () => {
             <h2 className="text-sm font-bold uppercase text-gray-400 mb-4 tracking-wider">
               {editingId ? "Edit Plan" : "Add New Plan"}
             </h2>
-            <form onSubmit={handleSubmit} className="grid grid-cols-2 gap-4">
+            <form onSubmit={handleSubmit} className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="flex flex-col gap-1">
                 <label className="text-xs text-gray-500 font-bold">Duration</label>
                 <select
