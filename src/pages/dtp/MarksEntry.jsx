@@ -15,6 +15,7 @@ const DTPMarksEntry = () => {
   const [students, setStudents] = useState([]);
   const [marksGrid, setMarksGrid] = useState({});
   const [loading, setLoading] = useState(false);
+  const [subjectToAdd, setSubjectToAdd] = useState("");
 
   // --- STEP 1: SEARCH EXAMS ---
   const handleSearch = async () => {
@@ -30,12 +31,20 @@ const DTPMarksEntry = () => {
   const handleSelectExam = async (exam) => {
     setSelectedExam(exam);
     try {
-      const res = await api.get("/api/dtp/subjects");
-      setMasterSubjects(res.data);
-      setChosenSubjects([]); // reset
+      const [subjectsRes, entryRes] = await Promise.all([
+        api.get("/api/dtp/subjects"),
+        api.get(
+          `/api/dtp/marks/entry-sheet?examId=${exam.id}&batchId=${exam.batch_id}`
+        ),
+      ]);
+
+      setMasterSubjects(subjectsRes.data);
+      setChosenSubjects(entryRes.data.subjects || []);
       setStep(2);
-    } catch {
-      alert("Could not load master subjects list");
+    } catch (err) {
+      alert(
+        err?.response?.data?.error || "Could not load subjects for this exam"
+      );
     }
   };
 
@@ -50,10 +59,11 @@ const DTPMarksEntry = () => {
   };
 
   const handleMaxMarksChange = (subId, value) => {
+    const parsed = parseInt(value, 10);
     setChosenSubjects((prev) =>
       prev.map((s) =>
         s.subject_id === subId
-          ? { ...s, max_marks: parseInt(value) || 0 }
+          ? { ...s, max_marks: Number.isNaN(parsed) ? 0 : parsed }
           : s
       )
     );
@@ -63,6 +73,10 @@ const DTPMarksEntry = () => {
   const proceedToMarksEntry = async () => {
     if (chosenSubjects.length === 0) {
       alert("Please add at least one subject");
+      return;
+    }
+    if (chosenSubjects.some((s) => !Number.isInteger(Number(s.max_marks)) || Number(s.max_marks) <= 0)) {
+      alert("Max marks must be a positive integer for all subjects");
       return;
     }
 
@@ -95,19 +109,20 @@ const DTPMarksEntry = () => {
       setMarksGrid(initialMarks);
 
       setStep(3);
-    } catch {
-      alert("Failed to initialize mark sheet");
+    } catch (err) {
+      alert(err?.response?.data?.error || "Failed to initialize mark sheet");
     } finally {
       setLoading(false);
     }
   };
 
   const handleMarkInput = (studentId, subjectId, value) => {
+    const normalized = value === "" ? "" : Number(value);
     setMarksGrid((prev) => ({
       ...prev,
       [studentId]: {
         ...(prev[studentId] || {}),
-        [subjectId]: value,
+        [subjectId]: normalized,
       },
     }));
   };
@@ -122,16 +137,47 @@ const DTPMarksEntry = () => {
 
   const submitMarks = async () => {
     const marksData = [];
+    const subjectMaxMap = chosenSubjects.reduce((acc, sub) => {
+      acc[sub.subject_id] = Number(sub.max_marks);
+      return acc;
+    }, {});
+    let hasInvalidRow = false;
 
     Object.keys(marksGrid).forEach((studentId) => {
       Object.keys(marksGrid[studentId]).forEach((subjectId) => {
+        const marksValue = marksGrid[studentId][subjectId];
+        if (marksValue === "" || marksValue === null || marksValue === undefined) {
+          return;
+        }
+
+        const marksNumber = Number(marksValue);
+        const maxForSubject = subjectMaxMap[subjectId];
+        if (
+          !Number.isInteger(marksNumber) ||
+          marksNumber < 0 ||
+          (Number.isInteger(maxForSubject) && marksNumber > maxForSubject)
+        ) {
+          hasInvalidRow = true;
+          return;
+        }
+
         marksData.push({
           studentId,
           subjectId,
-          marks: marksGrid[studentId][subjectId],
+          marks: marksNumber,
         });
       });
     });
+
+    if (hasInvalidRow) {
+      alert("Invalid marks found. Marks must be between 0 and max marks.");
+      return;
+    }
+
+    if (marksData.length === 0) {
+      alert("Enter at least one mark before saving");
+      return;
+    }
 
     try {
       await api.post("/api/dtp/marks/submit", {
@@ -143,8 +189,9 @@ const DTPMarksEntry = () => {
       setSelectedExam(null);
       setChosenSubjects([]);
       setMarksGrid({});
-    } catch {
-      alert("Failed to save marks");
+      setSubjectToAdd("");
+    } catch (err) {
+      alert(err?.response?.data?.error || err?.message || "Failed to save marks");
     }
   };
 
@@ -203,8 +250,14 @@ const DTPMarksEntry = () => {
 
           <select
             className="border p-2 w-full rounded"
-            value=""
-            onChange={(e) => addSubjectToExam(e.target.value)}
+            value={subjectToAdd}
+            onChange={(e) => {
+              const value = e.target.value;
+              setSubjectToAdd(value);
+              if (!value) return;
+              addSubjectToExam(value);
+              setSubjectToAdd("");
+            }}
           >
             <option value="">-- Choose Subject to Add --</option>
             {masterSubjects.map((s) => (
@@ -222,6 +275,7 @@ const DTPMarksEntry = () => {
               <span className="font-medium">{s.name}</span>
               <input
                 type="number"
+                min="1"
                 className="border w-20 p-1 text-center rounded"
                 value={s.max_marks}
                 onChange={(e) =>
@@ -267,6 +321,8 @@ const DTPMarksEntry = () => {
                     <td key={sub.subject_id} className="p-3">
                       <input
                         type="number"
+                        min="0"
+                        max={sub.max_marks}
                         className="w-16 mx-auto block border rounded p-1 text-center"
                         value={
                           marksGrid[st.student_id]?.[sub.subject_id] ?? ""

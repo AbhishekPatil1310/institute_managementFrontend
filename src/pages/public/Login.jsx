@@ -39,23 +39,19 @@ const Login = () => {
   };
 
   return (
-    // Background Wrapper: Centers everything and provides the gradient backdrop
     <div className="min-h-screen w-full flex items-center justify-center bg-slate-100 p-4 md:p-6">
       
-      {/* Main Card Container */}
       <div className="flex flex-col md:flex-row w-full max-w-5xl bg-white rounded-3xl overflow-hidden shadow-2xl min-h-[600px]">
         
-        {/* Left Section: Visual/Branding (Hidden on mobile) */}
         <div className="hidden md:flex md:w-1/2 relative ">
           <img
             src="/favicon.ico"
             alt="Institute"
-            className="absolute inset-0 w-full h-full object-cover opacity-70"
+            className="absolute inset-0 w-full h-full object-cover "
           />
 
         </div>
 
-        {/* Right Section: Form */}
         <div className="w-full md:w-1/2 flex items-center justify-center p-8 lg:p-16">
           <div className="w-full max-w-sm">
             <div className="text-center mb-10">
