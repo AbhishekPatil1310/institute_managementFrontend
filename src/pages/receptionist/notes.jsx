@@ -6,6 +6,7 @@ import {
   BookOpen,
   User,
   Calendar,
+  CheckCheck,
   Menu,
   X,
 } from "lucide-react";
@@ -119,6 +120,8 @@ const Notes = () => {
     const tempNote = {
       note_content_name: noteText,
       issued_at: new Date(),
+      is_acknowledged: false,
+      acknowledged_at: null,
     };
 
     // Optimistic UI
@@ -372,6 +375,16 @@ const Notes = () => {
                                   {new Date(
                                     note.issued_at
                                   ).toLocaleDateString()}
+                                </div>
+
+                                <div className="mt-2 flex items-center justify-end gap-1 text-[10px] font-semibold">
+                                  <CheckCheck
+                                    size={12}
+                                    className={note.is_acknowledged ? "text-blue-600" : "text-gray-300"}
+                                  />
+                                  <span className={note.is_acknowledged ? "text-blue-600" : "text-gray-400"}>
+                                    {note.is_acknowledged ? "Received" : "Delivery in process"}
+                                  </span>
                                 </div>
                               </div>
                             ))}

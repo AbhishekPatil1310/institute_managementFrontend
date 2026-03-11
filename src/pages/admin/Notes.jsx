@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import api from "../../services/api";
-import { Search, Plus, BookOpen, User, Calendar, Menu, X, Edit2, Trash2 } from "lucide-react";
+import { Search, Plus, BookOpen, User, Calendar, Menu, X, Edit2, Trash2, CheckCheck } from "lucide-react";
 
 const AdminNotes = () => {
   const [batches, setBatches] = useState([]);
@@ -138,6 +138,12 @@ const AdminNotes = () => {
 
                                 <p className="text-xs font-bold text-gray-800 truncate pr-8">{note.note_content_name}</p>
                                 <p className="text-[10px] text-gray-400 mt-1 uppercase font-mono">{new Date(note.issued_at).toLocaleDateString()}</p>
+                                <div className="mt-2 flex items-center justify-end gap-1 text-[10px] font-semibold">
+                                  <CheckCheck size={12} className={note.is_acknowledged ? "text-blue-600" : "text-gray-300"} />
+                                  <span className={note.is_acknowledged ? "text-blue-600" : "text-gray-400"}>
+                                    {note.is_acknowledged ? "Received" : "Delivery in process"}
+                                  </span>
+                                </div>
                               </div>
                             ))}
                           </div>
