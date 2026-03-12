@@ -2,14 +2,12 @@ import { useState } from "react";
 import api from "../../services/api";
 
 const DTPMarksEntry = () => {
-  const [step, setStep] = useState(1); // 1: Search, 2: Subjects, 3: Marks
+  const [step, setStep] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");
   const [exams, setExams] = useState([]);
   const [selectedExam, setSelectedExam] = useState(null);
 
-  // Master list of all possible subjects
   const [masterSubjects, setMasterSubjects] = useState([]);
-  // Subjects chosen / loaded for THIS exam (authoritative)
   const [chosenSubjects, setChosenSubjects] = useState([]);
 
   const [students, setStudents] = useState([]);
@@ -17,7 +15,7 @@ const DTPMarksEntry = () => {
   const [loading, setLoading] = useState(false);
   const [subjectToAdd, setSubjectToAdd] = useState("");
 
-  // --- STEP 1: SEARCH EXAMS ---
+  // STEP 1 — SEARCH EXAMS
   const handleSearch = async () => {
     try {
       const res = await api.get(`/api/dtp/exams/search?term=${searchTerm}`);
@@ -27,9 +25,10 @@ const DTPMarksEntry = () => {
     }
   };
 
-  // --- STEP 2: SETUP SUBJECTS ---
+  // STEP 2 — SELECT EXAM
   const handleSelectExam = async (exam) => {
     setSelectedExam(exam);
+
     try {
       const [subjectsRes, entryRes] = await Promise.all([
         api.get("/api/dtp/subjects"),
@@ -48,18 +47,32 @@ const DTPMarksEntry = () => {
     }
   };
 
+  // ADD SUBJECT
   const addSubjectToExam = (subjectId) => {
     const subject = masterSubjects.find((s) => s.id === subjectId);
-    if (subject && !chosenSubjects.find((s) => s.subject_id === subjectId)) {
+
+    if (!subject) return;
+
+    const alreadyAdded = chosenSubjects.find(
+      (s) => s.subject_id === subjectId
+    );
+
+    if (!alreadyAdded) {
       setChosenSubjects((prev) => [
         ...prev,
-        { subject_id: subject.id, name: subject.name, max_marks: 100 },
+        {
+          subject_id: subjectId,
+          name: subject.name,
+          max_marks: 100,
+        },
       ]);
     }
   };
 
+  // UPDATE MAX MARKS
   const handleMaxMarksChange = (subId, value) => {
     const parsed = parseInt(value, 10);
+
     setChosenSubjects((prev) =>
       prev.map((s) =>
         s.subject_id === subId
@@ -69,20 +82,53 @@ const DTPMarksEntry = () => {
     );
   };
 
-  // --- STEP 3: MARKS ENTRY ---
+  // REMOVE SUBJECT
+  const removeSubjectFromExam = async (subjectId) => {
+    if (!selectedExam?.id) return;
+
+    try {
+      await api.delete(
+        `/api/dtp/exams/${selectedExam.id}/subjects/${subjectId}`
+      );
+
+      setChosenSubjects((prev) =>
+        prev.filter((s) => s.subject_id !== subjectId)
+      );
+    } catch (err) {
+      if (err?.response?.status === 404) {
+        setChosenSubjects((prev) =>
+          prev.filter((s) => s.subject_id !== subjectId)
+        );
+        return;
+      }
+
+      alert(
+        err?.response?.data?.error ||
+        "Failed to remove subject. It may already have marks."
+      );
+    }
+  };
+
+  // STEP 3 — ENTER MARKS
   const proceedToMarksEntry = async () => {
     if (chosenSubjects.length === 0) {
       alert("Please add at least one subject");
       return;
     }
-    if (chosenSubjects.some((s) => !Number.isInteger(Number(s.max_marks)) || Number(s.max_marks) <= 0)) {
-      alert("Max marks must be a positive integer for all subjects");
+
+    if (
+      chosenSubjects.some(
+        (s) =>
+          !Number.isInteger(Number(s.max_marks)) || Number(s.max_marks) <= 0
+      )
+    ) {
+      alert("Max marks must be positive integers");
       return;
     }
 
     setLoading(true);
+
     try {
-      // 1. Save subject blueprint
       await api.post(`/api/dtp/exams/${selectedExam.id}/subjects`, {
         subjects: chosenSubjects.map((s) => ({
           subjectId: s.subject_id,
@@ -90,24 +136,24 @@ const DTPMarksEntry = () => {
         })),
       });
 
-      // 2. Fetch entry sheet (AUTHORITATIVE DATA)
       const res = await api.get(
         `/api/dtp/marks/entry-sheet?examId=${selectedExam.id}&batchId=${selectedExam.batch_id}`
       );
 
       setStudents(res.data.students);
-
-      // 🔥 CRITICAL FIX: overwrite subjects from backend config
       setChosenSubjects(res.data.subjects);
 
-      // Initialize marks grid
       const initialMarks = {};
+
       res.data.existingMarks.forEach((m) => {
-        if (!initialMarks[m.student_id]) initialMarks[m.student_id] = {};
+        if (!initialMarks[m.student_id]) {
+          initialMarks[m.student_id] = {};
+        }
+
         initialMarks[m.student_id][m.subject_id] = m.marks_obtained;
       });
-      setMarksGrid(initialMarks);
 
+      setMarksGrid(initialMarks);
       setStep(3);
     } catch (err) {
       alert(err?.response?.data?.error || "Failed to initialize mark sheet");
@@ -116,8 +162,10 @@ const DTPMarksEntry = () => {
     }
   };
 
+  // HANDLE MARK INPUT
   const handleMarkInput = (studentId, subjectId, value) => {
     const normalized = value === "" ? "" : Number(value);
+
     setMarksGrid((prev) => ({
       ...prev,
       [studentId]: {
@@ -127,35 +175,50 @@ const DTPMarksEntry = () => {
     }));
   };
 
+  // MARK ABSENT
   const markAbsent = (studentId) => {
     const zeroMarks = {};
+
     chosenSubjects.forEach((s) => {
       zeroMarks[s.subject_id] = 0;
     });
-    setMarksGrid((prev) => ({ ...prev, [studentId]: zeroMarks }));
+
+    setMarksGrid((prev) => ({
+      ...prev,
+      [studentId]: zeroMarks,
+    }));
   };
 
+  // SUBMIT MARKS
   const submitMarks = async () => {
     const marksData = [];
-    const subjectMaxMap = chosenSubjects.reduce((acc, sub) => {
-      acc[sub.subject_id] = Number(sub.max_marks);
-      return acc;
-    }, {});
+    const subjectMaxMap = {};
+
+    chosenSubjects.forEach((s) => {
+      subjectMaxMap[s.subject_id] = Number(s.max_marks);
+    });
+
     let hasInvalidRow = false;
 
     Object.keys(marksGrid).forEach((studentId) => {
       Object.keys(marksGrid[studentId]).forEach((subjectId) => {
         const marksValue = marksGrid[studentId][subjectId];
-        if (marksValue === "" || marksValue === null || marksValue === undefined) {
+
+        if (
+          marksValue === "" ||
+          marksValue === null ||
+          marksValue === undefined
+        ) {
           return;
         }
 
         const marksNumber = Number(marksValue);
-        const maxForSubject = subjectMaxMap[subjectId];
+        const maxMarks = subjectMaxMap[subjectId];
+
         if (
           !Number.isInteger(marksNumber) ||
           marksNumber < 0 ||
-          (Number.isInteger(maxForSubject) && marksNumber > maxForSubject)
+          marksNumber > maxMarks
         ) {
           hasInvalidRow = true;
           return;
@@ -170,7 +233,7 @@ const DTPMarksEntry = () => {
     });
 
     if (hasInvalidRow) {
-      alert("Invalid marks found. Marks must be between 0 and max marks.");
+      alert("Invalid marks found");
       return;
     }
 
@@ -184,33 +247,64 @@ const DTPMarksEntry = () => {
         examId: selectedExam.id,
         marksData,
       });
+
       alert("Marks saved successfully!");
+
       setStep(1);
       setSelectedExam(null);
       setChosenSubjects([]);
       setMarksGrid({});
       setSubjectToAdd("");
     } catch (err) {
-      alert(err?.response?.data?.error || err?.message || "Failed to save marks");
+      alert(err?.response?.data?.error || "Failed to save marks");
     }
   };
 
+  const clearSubjectMarks = async (subjectId) => {
+
+    if (!selectedExam?.id) return;
+
+    const confirmed = window.confirm(
+      "This will delete ALL marks entered for this subject. Continue?"
+    );
+
+    if (!confirmed) return;
+
+    try {
+
+      await api.delete(
+        `/api/dtp/exams/${selectedExam.id}/subjects/${subjectId}/marks`
+      );
+
+      alert("Marks cleared. You can now remove the subject.");
+
+    } catch (err) {
+
+      alert(
+        err?.response?.data?.error ||
+        "Failed to clear marks"
+      );
+
+    }
+
+  };
+
   return (
-    <div className="max-w-5xl mx-auto bg-white p-4 sm:p-6 rounded-lg shadow">
+    <div className="max-w-5xl mx-auto bg-white p-6 rounded-lg shadow">
       <h1 className="text-2xl font-bold border-b pb-4 mb-6">
         DTP Marks Entry
       </h1>
 
-      {/* STEP 1 */}
       {step === 1 && (
         <div className="space-y-4">
           <div className="flex gap-2">
             <input
               className="border p-2 flex-1 rounded"
-              placeholder="Search Exam Name or Date..."
+              placeholder="Search Exam..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
+
             <button
               onClick={handleSearch}
               className="bg-blue-600 text-white px-6 py-2 rounded"
@@ -223,12 +317,13 @@ const DTPMarksEntry = () => {
             {exams.map((e) => (
               <div
                 key={e.id}
-                className="p-3 flex justify-between items-center hover:bg-gray-50"
+                className="p-3 flex justify-between items-center"
               >
                 <span>
                   {e.name} (
                   {new Date(e.exam_date).toLocaleDateString()})
                 </span>
+
                 <button
                   onClick={() => handleSelectExam(e)}
                   className="text-blue-600 font-bold"
@@ -241,10 +336,9 @@ const DTPMarksEntry = () => {
         </div>
       )}
 
-      {/* STEP 2 */}
       {step === 2 && (
         <div className="space-y-6">
-          <h3 className="text-lg font-semibold text-gray-700">
+          <h3 className="text-lg font-semibold">
             Add Subjects for: {selectedExam?.name}
           </h3>
 
@@ -254,12 +348,15 @@ const DTPMarksEntry = () => {
             onChange={(e) => {
               const value = e.target.value;
               setSubjectToAdd(value);
+
               if (!value) return;
+
               addSubjectToExam(value);
               setSubjectToAdd("");
             }}
           >
-            <option value="">-- Choose Subject to Add --</option>
+            <option value="">-- Choose Subject --</option>
+
             {masterSubjects.map((s) => (
               <option key={s.id} value={s.id}>
                 {s.name}
@@ -270,37 +367,54 @@ const DTPMarksEntry = () => {
           {chosenSubjects.map((s) => (
             <div
               key={s.subject_id}
-              className="flex justify-between items-center bg-gray-50 p-3 rounded border"
+              className="flex justify-between items-center bg-gray-50 p-3 border rounded"
             >
-              <span className="font-medium">{s.name}</span>
-              <input
-                type="number"
-                min="1"
-                className="border w-20 p-1 text-center rounded"
-                value={s.max_marks}
-                onChange={(e) =>
-                  handleMaxMarksChange(s.subject_id, e.target.value)
-                }
-              />
+              <span>{s.name}</span>
+
+              <div className="flex gap-2 items-center">
+                <input
+                  type="number"
+                  min="1"
+                  value={s.max_marks}
+                  onChange={(e) =>
+                    handleMaxMarksChange(s.subject_id, e.target.value)
+                  }
+                  className="border w-20 p-1 text-center rounded"
+                />
+
+                <button
+                  onClick={() => removeSubjectFromExam(s.subject_id)}
+                  className="bg-red-100 text-red-700 px-3 py-1 rounded"
+                >
+                  Remove
+                </button>
+                <button
+                  type="button"
+                  onClick={() => clearSubjectMarks(s.subject_id)}
+                  className="px-3 py-1 rounded bg-yellow-100 text-yellow-800 font-semibold"
+                >
+                  Clear Marks
+                </button>
+              </div>
             </div>
           ))}
 
           <button
             onClick={proceedToMarksEntry}
-            className="bg-green-600 text-white px-6 py-2 rounded font-bold w-full"
+            className="bg-green-600 text-white px-6 py-2 rounded w-full"
           >
             {loading ? "Processing..." : "Configure & Enter Marks"}
           </button>
         </div>
       )}
 
-      {/* STEP 3 */}
       {step === 3 && (
-        <div className="overflow-x-auto border rounded">
-          <table className="w-full text-sm">
+        <div className="overflow-x-auto">
+          <table className="w-full border text-sm">
             <thead className="bg-gray-100">
               <tr>
                 <th className="p-3 text-left">Student</th>
+
                 {chosenSubjects.map((s) => (
                   <th key={s.subject_id} className="p-3 text-center">
                     {s.name}
@@ -310,20 +424,22 @@ const DTPMarksEntry = () => {
                     </span>
                   </th>
                 ))}
+
                 <th className="p-3 text-center">Action</th>
               </tr>
             </thead>
+
             <tbody>
               {students.map((st) => (
                 <tr key={st.student_id}>
                   <td className="p-3">{st.student_name}</td>
+
                   {chosenSubjects.map((sub) => (
                     <td key={sub.subject_id} className="p-3">
                       <input
                         type="number"
                         min="0"
                         max={sub.max_marks}
-                        className="w-16 mx-auto block border rounded p-1 text-center"
                         value={
                           marksGrid[st.student_id]?.[sub.subject_id] ?? ""
                         }
@@ -334,13 +450,15 @@ const DTPMarksEntry = () => {
                             e.target.value
                           )
                         }
+                        className="w-16 border rounded p-1 text-center"
                       />
                     </td>
                   ))}
+
                   <td className="p-3 text-center">
                     <button
                       onClick={() => markAbsent(st.student_id)}
-                      className="text-xs bg-red-100 text-red-600 px-2 py-1 rounded font-bold"
+                      className="bg-red-100 text-red-600 px-2 py-1 rounded"
                     >
                       Absent
                     </button>
@@ -352,7 +470,7 @@ const DTPMarksEntry = () => {
 
           <button
             onClick={submitMarks}
-            className="mt-4 bg-blue-600 text-white px-6 py-2 rounded font-bold"
+            className="mt-4 bg-blue-600 text-white px-6 py-2 rounded"
           >
             Save All Marks
           </button>
