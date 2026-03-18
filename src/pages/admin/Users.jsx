@@ -8,6 +8,10 @@ const Users = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(0);
+  const pageSize = 10;
+
   const [form, setForm] = useState({
     name: "",
     email: "",
@@ -15,20 +19,25 @@ const Users = () => {
     role: "RECEPTIONIST",
   });
 
-  const fetchUsers = async () => {
+  // Fetch on page change
+  useEffect(() => {
+    fetchUsers(currentPage);
+  }, [currentPage]);
+
+  const fetchUsers = async (page = 1) => {
     try {
-      const res = await api.get("/api/admin/users");
-      setUsers(res.data);
+      setLoading(true);
+      setError(null);
+
+      const res = await api.get(`/api/admin/users?page=${page}&limit=${pageSize}`);
+      setUsers(Array.isArray(res.data.users) ? res.data.users : []);
+      setTotalPages(res.data.totalPages || 0);
     } catch {
       setError("Failed to load users");
     } finally {
       setLoading(false);
     }
   };
-
-  useEffect(() => {
-    fetchUsers();
-  }, []);
 
   const handleChange = (e) => {
     setForm((f) => ({
@@ -53,7 +62,8 @@ const Users = () => {
     try {
       await api.post("/api/admin/users", form);
       resetForm();
-      fetchUsers();
+      setCurrentPage(1);
+      fetchUsers(1);
     } catch (err) {
       setError(
         err?.response?.data?.message ||
@@ -76,7 +86,7 @@ const Users = () => {
       await api.patch(
         `/api/admin/users/${user.id}/${action}`
       );
-      fetchUsers();
+      fetchUsers(currentPage);
     } catch (err) {
       alert(
         err?.response?.data?.message ||
@@ -238,6 +248,39 @@ const Users = () => {
           </div>
         )}
       </div>
+
+      {/* Pagination Controls */}
+      {totalPages > 1 && (
+        <div className="flex justify-center items-center gap-4 mt-6">
+          <button
+            onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+            disabled={currentPage === 1}
+            className={`px-4 py-2 rounded ${
+              currentPage === 1
+                ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                : "bg-blue-600 text-white hover:bg-blue-700"
+            }`}
+          >
+            Previous
+          </button>
+
+          <span className="text-sm text-gray-600">
+            Page {currentPage} of {totalPages}
+          </span>
+
+          <button
+            onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+            disabled={currentPage === totalPages}
+            className={`px-4 py-2 rounded ${
+              currentPage === totalPages
+                ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                : "bg-blue-600 text-white hover:bg-blue-700"
+            }`}
+          >
+            Next
+          </button>
+        </div>
+      )}
     </div>
   );
 };
