@@ -29,6 +29,10 @@ const Payments = () => {
   const [submitting, setSubmitting] = useState(false);
   const [loadingHistory, setLoadingHistory] = useState(true);
 
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(0);
+  const pageSize = 10;
+
   const [formData, setFormData] = useState({
     amount: selectedStudent?.pendingBalance || "",
     payment_source: "",
@@ -39,21 +43,28 @@ const Payments = () => {
      Initial Load
   ======================== */
   useEffect(() => {
-    fetchPayments();
     fetchSources();
   }, []);
 
   /* ========================
+     Fetch on Page Change
+  ======================== */
+  useEffect(() => {
+    fetchPayments(currentPage);
+  }, [currentPage]);
+
+  /* ========================
      Fetch Payments
   ======================== */
-  const fetchPayments = async () => {
+  const fetchPayments = async (page = 1) => {
     try {
       setLoadingHistory(true);
       setError(null);
 
-      const res = await api.get("/api/reception/payments");
+      const res = await api.get(`/api/reception/payments?page=${page}&limit=${pageSize}`);
 
-      setPayments(Array.isArray(res.data) ? res.data : []);
+      setPayments(Array.isArray(res.data.payments) ? res.data.payments : []);
+      setTotalPages(res.data.totalPages || 0);
     } catch (err) {
       console.error(err);
       setError("Failed to load payment history");
@@ -128,7 +139,7 @@ const Payments = () => {
         receipt_number: "",
       }));
 
-      fetchPayments();
+      fetchPayments(currentPage);
 
       // Clear navigation state
       navigate("/receptionist/payments", {
@@ -384,6 +395,29 @@ const Payments = () => {
           </table>
         </div>
       </div>
+
+      {/* ========================
+          Pagination
+      ======================== */}
+      {totalPages > 1 && (
+        <div className="flex justify-between items-center p-4 border-t bg-gray-50">
+          <button
+            onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+            disabled={currentPage === 1}
+            className="px-4 py-2 bg-blue-600 text-white rounded disabled:bg-gray-400"
+          >
+            Previous
+          </button>
+          <span>Page {currentPage} of {totalPages}</span>
+          <button
+            onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+            disabled={currentPage === totalPages}
+            className="px-4 py-2 bg-blue-600 text-white rounded disabled:bg-gray-400"
+          >
+            Next
+          </button>
+        </div>
+      )}
     </div>
   );
 };
