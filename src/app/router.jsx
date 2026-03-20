@@ -25,7 +25,7 @@ export const router = createBrowserRouter([
             path: studentRoutes.path,
             element: (
               <RequireRole role="STUDENT">
-                <RequirePasswordChange>{studentRoutes.layout}</RequirePasswordChange>
+                {studentRoutes.layout}
               </RequireRole>
             ),
             children: studentRoutes.children,
