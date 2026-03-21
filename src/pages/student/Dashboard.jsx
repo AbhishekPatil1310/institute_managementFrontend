@@ -65,7 +65,7 @@ const StudentProfile = () => {
               level={"H"} // High error correction
               includeMargin={true}
               imageSettings={{
-                src: "/logo.png", // Optional: put your academy logo in the middle
+                src: "/Sharda1.png", // Optional: put your academy logo in the middle
                 x: undefined,
                 y: undefined,
                 height: 24,

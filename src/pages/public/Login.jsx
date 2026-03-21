@@ -39,13 +39,13 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen w-full flex items-center justify-center bg-slate-100 p-4 md:p-6">
+    <div className="min-h-screen w-full flex items-center justify-center bg-slate-100 p-4 md:p-6 ">
       
-      <div className="flex flex-col md:flex-row w-full max-w-5xl bg-white rounded-3xl overflow-hidden shadow-2xl min-h-[600px]">
+      <div className="flex flex-col md:flex-row w-full max-w-7xl bg-white rounded-3xl overflow-hidden shadow-2xl min-h-[600px]">
         
         <div className="hidden md:flex md:w-1/2 relative ">
           <img
-            src="/favicon.ico"
+            src="/Sharda1.png"
             alt="Institute"
             className="absolute inset-0 w-full h-full object-cover "
           />
