@@ -6,6 +6,42 @@ const getCurrentMonth = () => {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
 };
 
+const groupMarksByBatchAndExam = (marksHistory = []) => {
+  const safeMarksHistory = Array.isArray(marksHistory) ? marksHistory : [];
+  const batchMap = new Map();
+
+  safeMarksHistory.forEach((item) => {
+    const batchName = item.batchName || "Unknown Batch";
+    const examName = item.examName || "Unknown Exam";
+    const examDate = item.examDate || null;
+    const examKey = `${examName}__${examDate || "no-date"}`;
+
+    if (!batchMap.has(batchName)) {
+      batchMap.set(batchName, { batchName, exams: new Map() });
+    }
+
+    const batchEntry = batchMap.get(batchName);
+    if (!batchEntry.exams.has(examKey)) {
+      batchEntry.exams.set(examKey, {
+        examName,
+        examDate,
+        subjects: [],
+      });
+    }
+
+    batchEntry.exams.get(examKey).subjects.push({
+      subjectName: item.subjectName,
+      marksObtained: item.marksObtained,
+      maxMarks: item.maxMarks,
+    });
+  });
+
+  return Array.from(batchMap.values()).map((batch) => ({
+    batchName: batch.batchName,
+    exams: Array.from(batch.exams.values()),
+  }));
+};
+
 const AdminDashboard = () => {
   const [financial, setFinancial] = useState(null);
   const [attendance, setAttendance] = useState(null);
@@ -57,6 +93,8 @@ const AdminDashboard = () => {
       setError("Failed to load student profile");
     }
   };
+
+  const groupedMarks = groupMarksByBatchAndExam(selectedStudent?.marksHistory);
 
   return (
     <div className="p-4 sm:p-6 bg-gray-50 min-h-screen">
@@ -204,6 +242,54 @@ const AdminDashboard = () => {
                   </tbody>
                 </table>
               </div>
+            </div>
+
+            {/* Marks Overview */}
+            <div className="md:col-span-2">
+              <h3 className="font-bold border-b pb-2 mb-3">Marks Overview</h3>
+              {groupedMarks.length === 0 ? (
+                <p className="text-sm text-gray-500">No marks available.</p>
+              ) : (
+                <div className="space-y-4">
+                  {groupedMarks.map((batch, batchIdx) => (
+                    <div key={`${batch.batchName}-${batchIdx}`} className="border rounded-lg p-4 bg-gray-50">
+                      <h4 className="font-bold text-blue-700 mb-3">{batch.batchName}</h4>
+                      <div className="space-y-3">
+                        {batch.exams.map((exam, examIdx) => (
+                          <div key={`${exam.examName}-${examIdx}`} className="bg-white border rounded p-3">
+                            <div className="flex flex-wrap items-center justify-between gap-2 mb-2">
+                              <p className="font-semibold text-gray-800">{exam.examName}</p>
+                              <p className="text-xs text-gray-500">
+                                {exam.examDate ? new Date(exam.examDate).toLocaleDateString() : "No date"}
+                              </p>
+                            </div>
+                            <div className="overflow-x-auto">
+                              <table className="w-full text-sm">
+                                <thead className="bg-gray-100">
+                                  <tr>
+                                    <th className="p-2 text-left">Subject</th>
+                                    <th className="p-2 text-left">Marks</th>
+                                  </tr>
+                                </thead>
+                                <tbody>
+                                  {exam.subjects.map((subject, subjectIdx) => (
+                                    <tr key={`${subject.subjectName}-${subjectIdx}`} className="border-b">
+                                      <td className="p-2">{subject.subjectName}</td>
+                                      <td className="p-2 font-semibold">
+                                        {subject.marksObtained}/{subject.maxMarks}
+                                      </td>
+                                    </tr>
+                                  ))}
+                                </tbody>
+                              </table>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
         </div>
